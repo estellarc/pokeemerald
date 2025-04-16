@@ -384,6 +384,9 @@
 #define OBJ_EVENT_PAL_TAG_RS_MAY                  0x1123
 #define OBJ_EVENT_PAL_TAG_DYNAMIC                 0x1124
 
+// FRLG Emoticons
+#define OBJ_EVENT_PAL_TAG_EMOTICONS               0x1149
+
 #if OW_FOLLOWERS_POKEBALLS
 // Vanilla
 #define OBJ_EVENT_PAL_TAG_BALL_MASTER             0x1150
