@@ -911,6 +911,8 @@ void CopyBgTilemapBufferToVram(u32 bg)
 
 void CopyToBgTilemapBufferRect(u32 bg, const void *src, u8 destX, u8 destY, u8 width, u8 height)
 {
+    CycleCountStart();
+    
     u16 destX16;
     u16 destY16;
     u16 mode;
@@ -929,6 +931,7 @@ void CopyToBgTilemapBufferRect(u32 bg, const void *src, u8 destX, u8 destY, u8 w
                     ((u16 *)sGpuBgConfigs2[bg].tilemap)[((destY16 * 0x20) + destX16)] = *srcCopy++;
                 }
             }
+            DebugPrintf("CopyToBgTilemapBufferRect Normal Time: %d", CycleCountEnd());
             break;
         }
         case BG_TYPE_AFFINE:
@@ -942,6 +945,7 @@ void CopyToBgTilemapBufferRect(u32 bg, const void *src, u8 destX, u8 destY, u8 w
                     ((u8 *)sGpuBgConfigs2[bg].tilemap)[((destY16 * mode) + destX16)] = *srcCopy++;
                 }
             }
+            DebugPrintf("CopyToBgTilemapBufferRect Affine Time: %d", CycleCountEnd());
             break;
         }
         }
@@ -955,6 +959,7 @@ void CopyToBgTilemapBufferRect_ChangePalette(u32 bg, const void *src, u8 destX, 
 
 void CopyRectToBgTilemapBufferRect(u32 bg, const void *src, u8 srcX, u8 srcY, u8 srcWidth, u8 srcHeight, u8 destX, u8 destY, u8 rectWidth, u8 rectHeight, u8 palette1, s16 tileOffset, s16 palette2)
 {
+    CycleCountStart();
     u16 screenWidth, screenHeight, screenSize;
     u16 var;
     const void *srcPtr;
@@ -979,6 +984,7 @@ void CopyRectToBgTilemapBufferRect(u32 bg, const void *src, u8 srcX, u8 srcY, u8
                 }
                 srcPtr += (srcWidth - rectWidth) * 2;
             }
+            DebugPrintf("CopyRectToBgTilemapBufferRect Normal Time: %d", CycleCountEnd());
             break;
         case BG_TYPE_AFFINE:
             srcPtr = src + ((srcY * srcWidth) + srcX);
@@ -992,6 +998,7 @@ void CopyRectToBgTilemapBufferRect(u32 bg, const void *src, u8 srcX, u8 srcY, u8
                 }
                 srcPtr += (srcWidth - rectWidth);
             }
+            DebugPrintf("CopyRectToBgTilemapBufferRect Affine Time: %d", CycleCountEnd());
             break;
         }
     }
@@ -999,6 +1006,7 @@ void CopyRectToBgTilemapBufferRect(u32 bg, const void *src, u8 srcX, u8 srcY, u8
 
 void FillBgTilemapBufferRect_Palette0(u32 bg, u16 tileNum, u8 x, u8 y, u8 width, u8 height)
 {
+    CycleCountStart();
     u16 x16;
     u16 y16;
     u16 mode;
@@ -1015,6 +1023,7 @@ void FillBgTilemapBufferRect_Palette0(u32 bg, u16 tileNum, u8 x, u8 y, u8 width,
                     ((u16 *)sGpuBgConfigs2[bg].tilemap)[((y16 * 0x20) + x16)] = tileNum;
                 }
             }
+            DebugPrintf("FillBgTilemapBufferRect_Palette0 Normal Time: %d", CycleCountEnd());
             break;
         case BG_TYPE_AFFINE:
             mode = GetBgMetricAffineMode(bg, 0x1);
@@ -1025,6 +1034,7 @@ void FillBgTilemapBufferRect_Palette0(u32 bg, u16 tileNum, u8 x, u8 y, u8 width,
                     ((u8 *)sGpuBgConfigs2[bg].tilemap)[((y16 * mode) + x16)] = tileNum;
                 }
             }
+            DebugPrintf("FillBgTilemapBufferRect_Palette0 Affine Time: %d", CycleCountEnd());
             break;
         }
     }
@@ -1037,6 +1047,7 @@ void FillBgTilemapBufferRect(u32 bg, u16 tileNum, u8 x, u8 y, u8 width, u8 heigh
 
 void WriteSequenceToBgTilemapBuffer(u32 bg, u16 firstTileNum, u8 x, u8 y, u8 width, u8 height, u8 paletteSlot, s16 tileNumDelta)
 {
+    CycleCountStart();
     u16 mode;
     u16 mode2;
     u16 attribute;
@@ -1059,6 +1070,7 @@ void WriteSequenceToBgTilemapBuffer(u32 bg, u16 firstTileNum, u8 x, u8 y, u8 wid
                     firstTileNum = (firstTileNum & 0xFC00) + ((firstTileNum + tileNumDelta) & 0x3FF);
                 }
             }
+            DebugPrintf("WriteSequenceToBgTilemapBuffer Normal Time: %d", CycleCountEnd());
             break;
         case BG_TYPE_AFFINE:
             mode3 = GetBgMetricAffineMode(bg, 0x1);
@@ -1070,6 +1082,7 @@ void WriteSequenceToBgTilemapBuffer(u32 bg, u16 firstTileNum, u8 x, u8 y, u8 wid
                     firstTileNum = (firstTileNum & 0xFC00) + ((firstTileNum + tileNumDelta) & 0x3FF);
                 }
             }
+            DebugPrintf("WriteSequenceToBgTilemapBuffer Affine Time: %d", CycleCountEnd());
             break;
         }
     }
