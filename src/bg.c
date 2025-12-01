@@ -179,14 +179,18 @@ u8 LoadBgVram(u32 bg, const void *src, u16 size, u16 destOffset, u32 mode)
     case 0x1:
         offset = sGpuBgConfigs.configs[bg].charBaseIndex * BG_CHAR_SIZE;
         offset = destOffset + offset;
+        CycleCountStart();
         cursor = RequestDma3Copy(src, (void *)(offset + BG_VRAM), size, 0);
+        DebugPrintf("Time: %d", CycleCountEnd());
         if (cursor == -1)
             return -1;
         break;
     case 0x2:
         offset = sGpuBgConfigs.configs[bg].mapBaseIndex * BG_SCREEN_SIZE;
         offset = destOffset + offset;
+        CycleCountStart();
         cursor = RequestDma3Copy(src, (void *)(offset + BG_VRAM), size, 0);
+        DebugPrintf("Time: %d", CycleCountEnd());
         if (cursor == -1)
             return -1;
         break;
