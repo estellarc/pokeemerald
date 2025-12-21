@@ -53,9 +53,28 @@ TEST("Move names fit on Contest Screen")
     // All moves explicitly listed here are too big to fit.
     switch (move)
     {
+#ifdef SPANISH
+    case MOVE_IRON_HEAD:
+    case MOVE_SHIFT_GEAR:
+    case MOVE_NOBLE_ROAR:
+    case MOVE_COURT_CHANGE:
+    case MOVE_CLANGOROUS_SOUL:
+    case MOVE_SCORCHING_SANDS:
+    case MOVE_THUNDEROUS_KICK:
+    case MOVE_MOUNTAIN_GALE:
+    case MOVE_INFERNAL_PARADE:
+    case MOVE_LAST_RESPECTS:
+    case MOVE_SPICY_EXTRACT:
+    case MOVE_BURNING_BULWARK:
+    case MOVE_ALLURING_VOICE:
+    case MOVE_WATER_SHURIKEN:
+    case MOVE_SPIKY_SHIELD:
+    case MOVE_POWER_UP_PUNCH:
+#else
     case MOVE_STOMPING_TANTRUM:
     case MOVE_NATURES_MADNESS:
     case MOVE_DOUBLE_IRON_BASH:
+#endif
         EXPECT_GT(GetStringWidth(fontId, GetMoveName(move), 0), widthPx);
         break;
     default:
