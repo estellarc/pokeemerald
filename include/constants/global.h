@@ -58,7 +58,12 @@
 #define NUM_LANGUAGES     7
 
 #define GAME_VERSION (VERSION_EMERALD)
-#define GAME_LANGUAGE (LANGUAGE_ENGLISH)
+
+#ifdef SPANISH 
+    #define GAME_LANGUAGE (LANGUAGE_SPANISH)
+#else // ENGLISH
+    #define GAME_LANGUAGE (LANGUAGE_ENGLISH)
+#endif
 
 // party sizes
 #define PARTY_SIZE 6

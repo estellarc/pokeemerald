@@ -137,6 +137,17 @@
 
 #define NUM_APRICORN_TREE_BYTES ROUND_BITS_TO_BYTES(APRICORN_TREE_COUNT)
 
+// Based on https://github.com/AsparagusEduardo/pokeemerald/tree/pret_europe
+#ifdef SPANISH
+    #define LANGUAGE_VALUE(english, spanish) (spanish)
+    #define COMPOUND_LANGUAGE_STRING(english, spanish) COMPOUND_STRING(spanish)
+    #define LANGUAGE_STRING(english, spanish) _(spanish)
+#else // ENGLISH
+    #define LANGUAGE_VALUE(english, spanish) (english)
+    #define COMPOUND_LANGUAGE_STRING(english, spanish) COMPOUND_STRING(english)
+    #define LANGUAGE_STRING(english, spanish) _(english)
+#endif
+
 // This produces an error at compile-time if expr is zero.
 // It looks like file.c:line: size of array `id' is negative
 #define STATIC_ASSERT(expr, id) typedef char id[(expr) ? 1 : -1];
