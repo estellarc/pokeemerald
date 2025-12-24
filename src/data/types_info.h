@@ -50,8 +50,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
 {
     [TYPE_NONE] =
     {
-        .name = _("None"),
-        .generic = _("a move"),
+        .name = LANGUAGE_STRING("None", "Ninguno"),
+        .generic = COMPOUND_LANGUAGE_STRING("a move", "un movimiento"),
         .palette = 15, // Uses TYPE_MYSTERY's icon
         .teraTypeRGBValue = RGB_WHITE,
         .damageCategory = DAMAGE_CATEGORY_PHYSICAL,
@@ -62,8 +62,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_NORMAL] =
     {
-        .name = _("Normal"),
-        .generic = _("a NORMAL move"),
+        .name = LANGUAGE_STRING("Normal", "Normal"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Normal move", "un movimiento Normal"),
         .palette = 13,
         .zMove = MOVE_BREAKNECK_BLITZ,
         .maxMove = MOVE_MAX_STRIKE,
@@ -82,8 +82,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_FIGHTING] =
     {
-        .name = _("Fighting"),
-        .generic = _("a FIGHTING move"),
+        .name = LANGUAGE_STRING("Fighting", "Lucha"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Fighting move", "un movimiento Lucha"),
         .palette = 13,
         .zMove = MOVE_ALL_OUT_PUMMELING,
         .maxMove = MOVE_MAX_KNUCKLE,
@@ -104,8 +104,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_FLYING] =
     {
-        .name = _("Flying"),
-        .generic = _("a FLYING move"),
+        .name = LANGUAGE_STRING("Flying", "Volador"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Flying move", "un movimiento Volador"),
         .palette = 14,
         .zMove = MOVE_SUPERSONIC_SKYSTRIKE,
         .maxMove = MOVE_MAX_AIRSTREAM,
@@ -126,8 +126,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_POISON] =
     {
-        .name = _("Poison"),
-        .generic = _("a POISON move"),
+        .name = LANGUAGE_STRING("Poison", "Veneno"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Poison move", "un movimiento Veneno"),
         .palette = 14,
         .zMove = MOVE_ACID_DOWNPOUR,
         .maxMove = MOVE_MAX_OOZE,
@@ -148,8 +148,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_GROUND] =
     {
-        .name = _("Ground"),
-        .generic = _("a GROUND move"),
+        .name = LANGUAGE_STRING("Ground", "Tierra"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Ground move", "un movimiento Tierra"),
         .palette = 13,
         .zMove = MOVE_TECTONIC_RAGE,
         .maxMove = MOVE_MAX_QUAKE,
@@ -170,8 +170,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_ROCK] =
     {
-        .name = _("Rock"),
-        .generic = _("a ROCK move"),
+        .name = LANGUAGE_STRING("Rock", "Roca"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Rock move", "un movimiento Roca"),
         .palette = 13,
         .zMove = MOVE_CONTINENTAL_CRUSH,
         .maxMove = MOVE_MAX_ROCKFALL,
@@ -192,8 +192,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_BUG] =
     {
-        .name = _("Bug"),
-        .generic = _("a BUG move"),
+        .name = LANGUAGE_STRING("Bug", "Bicho"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Bug move", "un movimiento Bicho"),
         .palette = 15,
         .zMove = MOVE_SAVAGE_SPIN_OUT,
         .maxMove = MOVE_MAX_FLUTTERBY,
@@ -214,8 +214,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_GHOST] =
     {
-        .name = _("Ghost"),
-        .generic = _("a GHOST move"),
+        .name = LANGUAGE_STRING("Ghost", "Fantasma"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Ghost move", "un movimiento Fantasma"),
         .palette = 14,
         .zMove = MOVE_NEVER_ENDING_NIGHTMARE,
         .maxMove = MOVE_MAX_PHANTASM,
@@ -236,8 +236,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_STEEL] =
     {
-        .name = _("Steel"),
-        .generic = _("a STEEL move"),
+        .name = LANGUAGE_STRING("Steel", "Acero"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Steel move", "un movimiento Acero"),
         .palette = 13,
         .zMove = MOVE_CORKSCREW_CRASH,
         .maxMove = MOVE_MAX_STEELSPIKE,
@@ -258,8 +258,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_MYSTERY] =
     {
-        .name = _("???"),
-        .generic = _("a ??? move"),
+        .name = LANGUAGE_STRING("???", "???"),
+        .generic = COMPOUND_LANGUAGE_STRING("a ??? move", "un movimiento ???"),
         .palette = 15,
         .teraTypeRGBValue = RGB_WHITE,
         .damageCategory = DAMAGE_CATEGORY_SPECIAL,
@@ -269,8 +269,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_FIRE] =
     {
-        .name = _("Fire"),
-        .generic = _("a FIRE move"),
+        .name = LANGUAGE_STRING("Fire", "Fuego"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Fire move", "un movimiento Fuego"),
         .palette = 13,
         .zMove = MOVE_INFERNO_OVERDRIVE,
         .maxMove = MOVE_MAX_FLARE,
@@ -291,8 +291,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_WATER] =
     {
-        .name = _("Water"),
-        .generic = _("a WATER move"),
+        .name = LANGUAGE_STRING("Water", "Agua"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Water move", "un movimiento Agua"),
         .palette = 14,
         .zMove = MOVE_HYDRO_VORTEX,
         .maxMove = MOVE_MAX_GEYSER,
@@ -313,8 +313,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_GRASS] =
     {
-        .name = _("Grass"),
-        .generic = _("a GRASS move"),
+        .name = LANGUAGE_STRING("Grass", "Planta"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Grass move", "un movimiento Planta"),
         .palette = 15,
         .zMove = MOVE_BLOOM_DOOM,
         .maxMove = MOVE_MAX_OVERGROWTH,
@@ -335,8 +335,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_ELECTRIC] =
     {
-        .name = _("Electric"),
-        .generic = _("an ELECTRIC move"),
+        .name = LANGUAGE_STRING("Electric", "Eléctrico"),
+        .generic = COMPOUND_LANGUAGE_STRING("an Electric move", "un movimiento Eléctrico"),
         .palette = 13,
         .zMove = MOVE_GIGAVOLT_HAVOC,
         .maxMove = MOVE_MAX_LIGHTNING,
@@ -357,8 +357,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_PSYCHIC] =
     {
-        .name = _("Psychic"),
-        .generic = _("a PSYCHIC move"),
+        .name = LANGUAGE_STRING("Psychic", "Psíquico"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Psychic move", "un movimiento Psíquico"),
         .palette = 14,
         .zMove = MOVE_SHATTERED_PSYCHE,
         .maxMove = MOVE_MAX_MINDSTORM,
@@ -379,8 +379,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_ICE] =
     {
-        .name = _("Ice"),
-        .generic = _("an ICE move"),
+        .name = LANGUAGE_STRING("Ice", "Hielo"),
+        .generic = COMPOUND_LANGUAGE_STRING("an Ice move", "un movimiento Hielo"),
         .palette = 14,
         .zMove = MOVE_SUBZERO_SLAMMER,
         .maxMove = MOVE_MAX_HAILSTORM,
@@ -401,8 +401,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_DRAGON] =
     {
-        .name = _("Dragon"),
-        .generic = _("a DRAGON move"),
+        .name = LANGUAGE_STRING("Dragon", "Dragón"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Dragon move", "un movimiento Dragón"),
         .palette = 15,
         .zMove = MOVE_DEVASTATING_DRAKE,
         .maxMove = MOVE_MAX_WYRMWIND,
@@ -423,8 +423,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_DARK] =
     {
-        .name = _("Dark"),
-        .generic = _("a DARK move"),
+        .name = LANGUAGE_STRING("Dark", "Siniestro"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Dark move", "un movimiento Siniestro"),
         .palette = 13,
         .zMove = MOVE_BLACK_HOLE_ECLIPSE,
         .maxMove = MOVE_MAX_DARKNESS,
@@ -445,8 +445,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_FAIRY] =
     {
-        .name = _("Fairy"),
-        .generic = _("a FAIRY move"),
+        .name = LANGUAGE_STRING("Fairy", "Hada"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Fairy move", "un movimiento Hada"),
         .palette = 14,
         .zMove = MOVE_TWINKLE_TACKLE,
         .maxMove = MOVE_MAX_STARFALL,
@@ -467,8 +467,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_STELLAR] =
     {
-        .name = _("Stellar"),
-        .generic = _("a STELLAR move"),
+        .name = LANGUAGE_STRING("Stellar", "Astral"),
+        .generic = COMPOUND_LANGUAGE_STRING("a Stellar move", "un movimiento Astral"),
         .palette = 15,
         .zMove = MOVE_BREAKNECK_BLITZ,
         .maxMove = MOVE_MAX_STRIKE,

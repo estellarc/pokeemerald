@@ -119,7 +119,7 @@ struct TrainerClass
 struct TypeInfo
 {
     u8 name[TYPE_NAME_LENGTH + 1];
-    u8 generic[17];
+    const u8 *generic;
     u8 palette;
     u16 zMove;
     u16 maxMove;
