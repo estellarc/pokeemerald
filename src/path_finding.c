@@ -423,7 +423,15 @@ static inline struct PathNode *PathNode_Create(struct PathFinderContext *ctx, s1
         return NULL;
 
     struct PathNode *node = &ctx->nodeBuffer[ctx->nodeCount];
-    u32 costH = PATH_FINDER_WEIGHT * ManhattanDistance(x, y, ctx->target.x, ctx->target.y);
+
+    u32 costH;
+    u32 distance = ManhattanDistance(x, y, ctx->target.x, ctx->target.y);
+
+    // I don't know why the compiler can't optimize this itself, but it does.
+    if (PATH_FINDER_WEIGHT == 1.5)
+        costH = distance + (distance >> 1);
+    else
+        costH = PATH_FINDER_WEIGHT * ManhattanDistance(x, y, ctx->target.x, ctx->target.y);
 
     node->x = x;
     node->y = y;
