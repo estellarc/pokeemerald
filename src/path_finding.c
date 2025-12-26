@@ -378,6 +378,7 @@ static u8 *ReconstructPath(struct PathNode *targetNode, u8 facingDirection)
         movementScript[index++] = MOVEMENT_ACTION_FACE_DOWN + facingDirection - 1;
 
     movementScript[index] = MOVEMENT_ACTION_GENERATED_END;
+    movementScript++; // Ignore begin marker
 
     return movementScript;
 }
