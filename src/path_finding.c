@@ -85,7 +85,7 @@ static inline void PathQueue_HeapifyDown(struct PathQueue *queue, u32 index);
 
 static struct PathList PathList_Create(u32 capacity);
 static void PathList_Destroy(struct PathList *list);
-static bool32 PathList_TryInset(struct PathList *list, struct PathNode *node, struct PathNode **out);
+static bool32 PathList_TryInsert(struct PathList *list, struct PathNode *node, struct PathNode **out);
 static bool32 PathList_HasNode(struct PathList *list, struct PathNode *node);
 
 static const u8 sNeighbors[] =
@@ -282,7 +282,7 @@ static u8 *FindPathForObjectEvent(struct PathFinderContext *ctx, u32 maxNodes)
     while (PathQueue_Pop(&ctx->nodeFrontier, &nextNode))
     {
         struct PathNode *currentNode = NULL;
-        bool32 inserted = PathList_TryInset(&ctx->exploredNodes, nextNode, &currentNode);
+        bool32 inserted = PathList_TryInsert(&ctx->exploredNodes, nextNode, &currentNode);
         if (inserted == FALSE)
             continue;
 
@@ -631,7 +631,7 @@ static void PathList_Destroy(struct PathList *list)
     list->size = 0;
 }
 
-static bool32 PathList_TryInset(struct PathList *list, struct PathNode *node, struct PathNode **out)
+static bool32 PathList_TryInsert(struct PathList *list, struct PathNode *node, struct PathNode **out)
 {
     u32 index = PathNode_Hash(node) & list->mask;
 
