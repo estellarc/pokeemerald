@@ -16,7 +16,7 @@
 #pragma GCC optimize("O3")
 
 #define PATH_FINDER_WEIGHT 1.5
-#define PATH_FINDER_MAX_ELEVATION 15
+#define PATH_FINDER_MAX_ELEVATION MAX_ELEVATION_LEVEL
 
 struct PathNode
 {
@@ -85,7 +85,7 @@ static inline void PathQueue_HeapifyDown(struct PathQueue *queue, u32 index);
 
 static struct PathList PathList_Create(u32 capacity);
 static void PathList_Destroy(struct PathList *list);
-static bool32 PathList_TryInset(struct PathList *list, struct PathNode *node, struct PathNode **out);
+static bool32 PathList_TryInsert(struct PathList *list, struct PathNode *node, struct PathNode **out);
 static bool32 PathList_HasNode(struct PathList *list, struct PathNode *node);
 
 static const u8 sNeighbors[] =
@@ -282,7 +282,7 @@ static u8 *FindPathForObjectEvent(struct PathFinderContext *ctx, u32 maxNodes)
     while (PathQueue_Pop(&ctx->nodeFrontier, &nextNode))
     {
         struct PathNode *currentNode = NULL;
-        bool32 inserted = PathList_TryInset(&ctx->exploredNodes, nextNode, &currentNode);
+        bool32 inserted = PathList_TryInsert(&ctx->exploredNodes, nextNode, &currentNode);
         if (inserted == FALSE)
             continue;
 
@@ -378,6 +378,7 @@ static u8 *ReconstructPath(struct PathNode *targetNode, u8 facingDirection)
         movementScript[index++] = MOVEMENT_ACTION_FACE_DOWN + facingDirection - 1;
 
     movementScript[index] = MOVEMENT_ACTION_GENERATED_END;
+    movementScript++; // Ignore begin marker
 
     return movementScript;
 }
@@ -422,7 +423,15 @@ static inline struct PathNode *PathNode_Create(struct PathFinderContext *ctx, s1
         return NULL;
 
     struct PathNode *node = &ctx->nodeBuffer[ctx->nodeCount];
-    u32 costH = PATH_FINDER_WEIGHT * ManhattanDistance(x, y, ctx->target.x, ctx->target.y);
+
+    u32 costH;
+    u32 distance = ManhattanDistance(x, y, ctx->target.x, ctx->target.y);
+
+    // I don't know why the compiler can't optimize this itself, but it does.
+    if (PATH_FINDER_WEIGHT == 1.5)
+        costH = distance + (distance >> 1);
+    else
+        costH = PATH_FINDER_WEIGHT * ManhattanDistance(x, y, ctx->target.x, ctx->target.y);
 
     node->x = x;
     node->y = y;
@@ -631,7 +640,7 @@ static void PathList_Destroy(struct PathList *list)
     list->size = 0;
 }
 
-static bool32 PathList_TryInset(struct PathList *list, struct PathNode *node, struct PathNode **out)
+static bool32 PathList_TryInsert(struct PathList *list, struct PathNode *node, struct PathNode **out)
 {
     u32 index = PathNode_Hash(node) & list->mask;
 
