@@ -272,6 +272,8 @@ $(FONTGFXDIR)/frlg_male.fwjpnfont: $(FONTGFXDIR)/japanese_frlg_male.png
 $(FONTGFXDIR)/frlg_female.fwjpnfont: $(FONTGFXDIR)/japanese_frlg_female.png
 	$(GFX) $< $@
 
+$(FONTGFXDIR)/normal_frlg.latfont: $(FONTGFXDIR)/latin_frlg.png
+	$(GFX) $< $@
 
 ### Miscellaneous ###
 
