@@ -17,7 +17,7 @@
 
 #define PATH_FINDER_WEIGHT          1.5
 #define PATH_FINDER_MAX_ELEVATION   15
-#define PATH_FINDER_PRINT_TIME      TRUE
+#define PATH_FINDER_PRINT_TIME      FALSE
 
 struct PathNode
 {
@@ -67,8 +67,9 @@ struct PathFinderContext
 
 static u8 *FindPathForObjectEvent(struct PathFinderContext *ctx, u32 maxNodes);
 static void MoveObjectEventToCoords(u8 localId, s16 targetX, s16 targetY, u8 facingDirection, u32 speed, u32 maxNodes);
+static bool32 FindObjectEventApproachPosition(u8 localId, u8 direction, struct Coords16* result);
 static u8 *ReconstructPath(struct PathNode *targetNode, u8 facingDirection);
-static inline bool32 PathFinderTargetReached(struct PathFinderContext *ctx, struct PathNode *node);
+static inline bool32 PathFinderTargetReached(struct PathFinderContext *ctx);
 static inline u32 ManhattanDistance(s16 x1, s16 y1, s16 x2, s16 y2);
 static u8 CheckForPathFinderCollision(struct PathFinderContext *ctx, s16 x, s16 y, u8 direction, u8 currentBehavior, u8 nextBehavior);
 static inline void TryCreateNeighbor(struct PathFinderContext *ctx, u8 direction);
@@ -263,6 +264,43 @@ void ScrCmd_moveobjecttocoords(struct ScriptContext *ctx)
     SetMovingNpcId(localId);
 }
 
+void ScrCmd_approachobject(struct ScriptContext *ctx)
+{
+    u16 localId = VarGet(ScriptReadHalfword(ctx));
+    u16 targetLocalId = VarGet(ScriptReadHalfword(ctx));
+    u8 facingDirection = VarGet(ScriptReadByte(ctx));
+    u8 approachDirection = VarGet(ScriptReadByte(ctx));
+    u8 speed = VarGet(ScriptReadByte(ctx));
+    u32 maxNodes = ScriptReadWord(ctx);
+    struct ObjectEvent *objEvent;
+    struct Coords16 coords;
+
+    Script_RequestEffects(SCREFF_V1 | SCREFF_HARDWARE);
+
+    // When applying script movements to follower, it may have frozen animation that must be cleared
+    if ((localId == OBJ_EVENT_ID_FOLLOWER && (objEvent = GetFollowerObject()) && objEvent->frozen)
+            || ((objEvent = &gObjectEvents[GetObjectEventIdByLocalId(localId)]) && IS_OW_MON_OBJ(objEvent)))
+    {
+        ClearObjectEventMovement(objEvent, &gSprites[objEvent->spriteId]);
+        gSprites[objEvent->spriteId].animCmdIndex = 0; // Reset start frame of animation
+    }
+
+    bool32 result = FindObjectEventApproachPosition(targetLocalId, approachDirection, &coords);
+    if (result == FALSE)
+    {
+        PlaySE(SE_PIN);
+        objEvent->directionOverwrite = DIR_NONE;
+        ScriptMovement_StartObjectMovementScript(localId, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, sPathFinderFailScript);
+        return;
+    }
+
+    if (localId != OBJ_EVENT_ID_FOLLOWER && !FlagGet(FLAG_SAFE_FOLLOWER_MOVEMENT))
+        ScriptHideFollower();
+
+    MoveObjectEventToCoords(localId, coords.x, coords.y, facingDirection, speed, maxNodes);
+    SetMovingNpcId(localId);
+}
+
 static void MoveObjectEventToCoords(u8 localId, s16 targetX, s16 targetY, u8 facingDirection, u32 speed, u32 maxNodes)
 {
     if (PATH_FINDER_PRINT_TIME)
@@ -306,7 +344,7 @@ static u8 *FindPathForObjectEvent(struct PathFinderContext *ctx, u32 maxNodes)
         if (inserted == FALSE)
             continue;
 
-        if (PathFinderTargetReached(ctx, ctx->currentNode))
+        if (PathFinderTargetReached(ctx))
             return ReconstructPath(ctx->currentNode, ctx->facingDirection);
 
         u8 direction = ctx->currentNode->originDirection;
@@ -317,6 +355,26 @@ static u8 *FindPathForObjectEvent(struct PathFinderContext *ctx, u32 maxNodes)
     }
 
     return NULL;
+}
+
+static bool32 FindObjectEventApproachPosition(u8 localId, u8 direction, struct Coords16* result)
+{
+    if (direction == DIR_NONE)
+        return FALSE;
+
+    if (direction > DIR_EAST)
+        direction -= DIR_EAST;
+
+    struct ObjectEvent *objectEvent = &gObjectEvents[GetObjectEventIdByLocalId(localId)];
+
+    struct Coords16 targetCoords;
+    targetCoords.x = objectEvent->currentCoords.x;
+    targetCoords.y = objectEvent->currentCoords.y;
+
+    result->x = targetCoords.x + gDirectionToVectors[direction].x - MAP_OFFSET;
+    result->y = targetCoords.y + gDirectionToVectors[direction].y - MAP_OFFSET;
+
+    return TRUE;
 }
 
 static inline void TryCreateNeighbor(struct PathFinderContext *ctx, u8 direction)
@@ -415,9 +473,9 @@ static u8 *ReconstructPath(struct PathNode *targetNode, u8 facingDirection)
     return movementScript;
 }
 
-static inline bool32 PathFinderTargetReached(struct PathFinderContext *ctx, struct PathNode *node)
+static inline bool32 PathFinderTargetReached(struct PathFinderContext *ctx)
 {
-    if (ctx->target.x == node->x && ctx->target.y == node->y)
+    if (ctx->target.x == ctx->currentNode->x && ctx->target.y == ctx->currentNode->y)
         return TRUE;
 
     return FALSE;
