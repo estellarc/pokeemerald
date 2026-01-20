@@ -28,6 +28,7 @@ struct PathNode
     s16 y;
     u8 elevation;
     u8 movementAction;
+    u8 originDirection;
 };
 
 // Priority queue used to
@@ -72,7 +73,7 @@ static inline u32 ManhattanDistance(s16 x1, s16 y1, s16 x2, s16 y2);
 static u8 CheckForPathFinderCollision(struct ObjectEvent *objectEvent, struct PathNode *node, s16 x, s16 y, u8 direction);
 static inline void TryCreateNeighbor(struct PathFinderContext *ctx, u8 direction);
 
-static inline struct PathNode *PathNode_Create(struct PathFinderContext *ctx, s16 x, s16 y, u32 costG);
+static inline struct PathNode *PathNode_Create(struct PathFinderContext *ctx, s16 x, s16 y, u8 direction, u32 costG);
 static inline u8 PathNode_GetElevation(struct PathNode *node, s16 x, s16 y);
 static inline bool32 PathNode_HasLowerCost(struct PathNode *node1, struct PathNode *node2);
 static inline bool32 PathNode_Equal(struct PathNode *node1, struct PathNode *node2);
@@ -90,12 +91,22 @@ static void PathList_Destroy(struct PathList *list);
 static bool32 PathList_TryInsert(struct PathList *list, struct PathNode *node, struct PathNode **out);
 static bool32 PathList_HasNode(struct PathList *list, struct PathNode *node);
 
-static const u8 sNeighbors[] =
+static const u8 sNeighbors[CARDINAL_DIRECTION_COUNT][4] =
 {
-    DIR_SOUTH,
-    DIR_NORTH,
-    DIR_WEST,
-    DIR_EAST,
+    [DIR_NONE]  = { DIR_SOUTH, DIR_NORTH, DIR_WEST, DIR_EAST },
+    [DIR_SOUTH] = { DIR_NORTH, DIR_WEST,  DIR_EAST, DIR_NONE },
+    [DIR_NORTH] = { DIR_SOUTH, DIR_WEST,  DIR_EAST, DIR_NONE },
+    [DIR_WEST]  = { DIR_SOUTH, DIR_NORTH, DIR_EAST, DIR_NONE },
+    [DIR_EAST]  = { DIR_SOUTH, DIR_NORTH, DIR_WEST, DIR_NONE },
+};
+
+static const u8 sNeighborCount[CARDINAL_DIRECTION_COUNT] =
+{
+    [DIR_NONE]  = 4,
+    [DIR_SOUTH] = 3,
+    [DIR_NORTH] = 3,
+    [DIR_WEST]  = 3,
+    [DIR_EAST]  = 3,
 };
 
 // Based on the Manhattan Distance.
@@ -281,7 +292,7 @@ static u8 *FindPathForObjectEvent(struct PathFinderContext *ctx, u32 maxNodes)
     if (maxNodes == 0)
         return NULL;
 
-    struct PathNode *startNode = PathNode_Create(ctx, ctx->start.x, ctx->start.y, 0);
+    struct PathNode *startNode = PathNode_Create(ctx, ctx->start.x, ctx->start.y, DIR_NONE, 0);
     startNode->elevation = ctx->objectEvent->currentElevation;
     ctx->nodeCount++;
 
@@ -298,8 +309,11 @@ static u8 *FindPathForObjectEvent(struct PathFinderContext *ctx, u32 maxNodes)
         if (PathFinderTargetReached(ctx, ctx->currentNode))
             return ReconstructPath(ctx->currentNode, ctx->facingDirection);
 
-        for (u32 i = 0; i < ARRAY_COUNT(sNeighbors); i++)
-            TryCreateNeighbor(ctx, sNeighbors[i]);
+        u8 direction = ctx->currentNode->originDirection;
+        u8 neighborCount = sNeighborCount[direction];
+
+        for (u32 i = 0; i < neighborCount; i++)
+            TryCreateNeighbor(ctx, sNeighbors[direction][i]);
     }
 
     return NULL;
@@ -324,7 +338,7 @@ static inline void TryCreateNeighbor(struct PathFinderContext *ctx, u8 direction
 
         u32 tentativeG = currentNode->costG + sPrecomputedDistance[direction];
 
-        neighbor = PathNode_Create(ctx, neighborX, neighborY, tentativeG);
+        neighbor = PathNode_Create(ctx, neighborX, neighborY, direction, tentativeG);
         if (neighbor == NULL)
             return;
 
@@ -340,7 +354,7 @@ static inline void TryCreateNeighbor(struct PathFinderContext *ctx, u8 direction
 
         u32 tentativeG = currentNode->costG + sPrecomputedDistance[direction] * 2;
 
-        neighbor = PathNode_Create(ctx, neighborX, neighborY, tentativeG);
+        neighbor = PathNode_Create(ctx, neighborX, neighborY, direction, tentativeG);
         if (neighbor == NULL)
             return;
 
@@ -429,7 +443,19 @@ static inline u32 ManhattanDistance(s16 x1, s16 y1, s16 x2, s16 y2)
 // Nodes /////////////////////////
 //////////////////////////////////
 
-static inline struct PathNode *PathNode_Create(struct PathFinderContext *ctx, s16 x, s16 y, u32 costG)
+static inline u8 OppositeDirection(u8 direction)
+{
+    switch (direction)
+    {
+        case DIR_SOUTH: return DIR_NORTH;
+        case DIR_NORTH: return DIR_SOUTH;
+        case DIR_WEST:  return DIR_EAST;
+        case DIR_EAST:  return DIR_WEST;
+        default:        return DIR_NONE;
+    }
+}
+
+static inline struct PathNode *PathNode_Create(struct PathFinderContext *ctx, s16 x, s16 y, u8 direction, u32 costG)
 {
     if (ctx->maxNodes == ctx->nodeCount)
         return NULL;
@@ -451,6 +477,7 @@ static inline struct PathNode *PathNode_Create(struct PathFinderContext *ctx, s1
     node->costG = costG;
     node->costF = costG + costH;
     node->parent = ctx->currentNode;
+    node->originDirection = OppositeDirection(direction);
 
     return node;
 }
