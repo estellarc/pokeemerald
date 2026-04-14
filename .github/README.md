@@ -1,4 +1,4 @@
-# Pathfinder 1.1.0
+# Pathfinder 1.1.1
 
 ## About
 
@@ -53,6 +53,13 @@ This variant of the A* algorithm provides better performance for searching the f
 However Weighted A* can generate less natural-looking paths than regual A*, and it can be tricked more easly by mazes, but it provides better performance in most cases, since it requires less nodes to find a valid path.
 
 ## Changelog
+
+### 1.1.1 - 2026-4-14
+
+### Changed
+- Improve preformance by caching metatile behaviors.
+- Fix potential UBs.
+- Fix hash function `fmix32` implementation.
 
 ### 1.1.0 - 2026-1-20
 

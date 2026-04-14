@@ -29,6 +29,7 @@ struct PathNode
     u8 elevation;
     u8 movementAction;
     u8 originDirection;
+    u8 currentBehavior;
 };
 
 // Priority queue used to
@@ -74,12 +75,16 @@ static inline u32 ManhattanDistance(s16 x1, s16 y1, s16 x2, s16 y2);
 static u8 CheckForPathFinderCollision(struct PathFinderContext *ctx, s16 x, s16 y, u8 direction, u8 currentBehavior, u8 nextBehavior);
 static inline void TryCreateNeighbor(struct PathFinderContext *ctx, u8 direction);
 
-static inline struct PathNode *PathNode_Create(struct PathFinderContext *ctx, s16 x, s16 y, u8 direction, u32 costG);
+// PathNode utility functions
+static inline void PathNode_CreateStart(struct PathFinderContext *ctx);
+static inline void PathNode_CreateNeighbor(struct PathFinderContext *ctx, s16 x, s16 y, u8 direction, u32 costG, u8 currentBehavior, u8 movementAction);
+static inline u32 PathNode_ComputeCostH(struct PathFinderContext *ctx, s16 x, s16 y);
 static inline u8 PathNode_GetElevation(struct PathNode *node, s16 x, s16 y);
 static inline bool32 PathNode_HasLowerCost(struct PathNode *node1, struct PathNode *node2);
-static inline bool32 PathNode_Equal(struct PathNode *node1, struct PathNode *node2);
-static inline u32 PathNode_Hash(struct PathNode *node);
+static inline bool32 PathNode_MatchesCoords(struct PathNode *node1, s16 x, s16 y, u8 elevation);
+static inline u32 PathNode_Hash(s16 x, s16 y, u8 elevation);
 
+// Priority queue functions
 static struct PathQueue PathQueue_Create(u32 capacity);
 static void PathQueue_Destroy(struct PathQueue *queue);
 static bool32 PathQueue_Push(struct PathQueue *queue, struct PathNode *node);
@@ -87,10 +92,11 @@ static bool32 PathQueue_Pop(struct PathQueue *queue, struct PathNode **outNode);
 static inline void PathQueue_HeapifyUp(struct PathQueue *queue, u32 index);
 static inline void PathQueue_HeapifyDown(struct PathQueue *queue, u32 index);
 
+// Unordered set functions
 static struct PathList PathList_Create(u32 capacity);
 static void PathList_Destroy(struct PathList *list);
 static bool32 PathList_TryInsert(struct PathList *list, struct PathNode *node, struct PathNode **out);
-static bool32 PathList_HasNode(struct PathList *list, struct PathNode *node);
+static bool32 PathList_ContainsCoords(struct PathList *list, s16 x, s16 y, u8 elevation);
 
 static const u8 sNeighbors[CARDINAL_DIRECTION_COUNT][4] =
 {
@@ -330,12 +336,8 @@ static u8 *FindPathForObjectEvent(struct PathFinderContext *ctx, u32 maxNodes)
     if (maxNodes == 0)
         return NULL;
 
-    struct PathNode *startNode = PathNode_Create(ctx, ctx->start.x, ctx->start.y, DIR_NONE, 0);
-    startNode->elevation = ctx->objectEvent->currentElevation;
-    ctx->nodeCount++;
-
-    PathQueue_Push(&ctx->nodeFrontier, startNode);
     struct PathNode *nextNode;
+    PathNode_CreateStart(ctx);
 
     while (PathQueue_Pop(&ctx->nodeFrontier, &nextNode))
     {
@@ -383,9 +385,9 @@ static inline void TryCreateNeighbor(struct PathFinderContext *ctx, u8 direction
     s16 neighborX = currentNode->x + gDirectionToVectors[direction].x;
     s16 neighborY = currentNode->y + gDirectionToVectors[direction].y;
     u8 nextBehavior = MapGridGetMetatileBehaviorAt(neighborX, neighborY);
-    u8 currentBehavior = MapGridGetMetatileBehaviorAt(ctx->currentNode->x, ctx->currentNode->y);
+    u8 currentBehavior = currentNode->currentBehavior;
+
     u8 collision = CheckForPathFinderCollision(ctx, neighborX, neighborY, direction, currentBehavior, nextBehavior);
-    struct PathNode *neighbor = NULL;
 
     if (collision == COLLISION_NONE)
     {
@@ -394,17 +396,9 @@ static inline void TryCreateNeighbor(struct PathFinderContext *ctx, u8 direction
             direction = ctx->objectEvent->directionOverwrite;
             neighborX = currentNode->x + gDirectionToVectors[direction].x;
             neighborY = currentNode->y + gDirectionToVectors[direction].y;
+            nextBehavior = MapGridGetMetatileBehaviorAt(neighborX, neighborY);
         }
-
-        u32 tentativeG = currentNode->costG + sPrecomputedDistance[direction];
-
-        neighbor = PathNode_Create(ctx, neighborX, neighborY, direction, tentativeG);
-        if (neighbor == NULL)
-            return;
-
-        if (PathList_HasNode(&ctx->exploredNodes, neighbor))
-            return;
-
+        
         u32 speed = ctx->speed;
         if (SLOW_MOVEMENT_ON_STAIRS && speed != 0 &&
             ObjectMovingOnRockStairsWithBehaviors(ctx->objectEvent, direction, currentBehavior, nextBehavior))
@@ -412,31 +406,22 @@ static inline void TryCreateNeighbor(struct PathFinderContext *ctx, u8 direction
             speed--;
         }
 
-        neighbor->movementAction = sMovementsBySpeed[speed][direction];
+        u32 tentativeG = currentNode->costG + sPrecomputedDistance[direction];
+        u8 movementAction = sMovementsBySpeed[speed][direction];
+
+        PathNode_CreateNeighbor(ctx, neighborX, neighborY, direction, tentativeG, nextBehavior, movementAction);
     }
     else if (collision == COLLISION_LEDGE_JUMP)
     {
         neighborX = currentNode->x + gDirectionToVectors[direction].x * 2;
         neighborY = currentNode->y + gDirectionToVectors[direction].y * 2;
+        nextBehavior = MapGridGetMetatileBehaviorAt(neighborX, neighborY);
 
         u32 tentativeG = currentNode->costG + sPrecomputedDistance[direction] * 2;
+        u8 movementAction = sJump2Movement[direction];
 
-        neighbor = PathNode_Create(ctx, neighborX, neighborY, direction, tentativeG);
-        if (neighbor == NULL)
-            return;
-
-        if (PathList_HasNode(&ctx->exploredNodes, neighbor))
-            return;
-
-        neighbor->movementAction = sJump2Movement[direction];
+        PathNode_CreateNeighbor(ctx, neighborX, neighborY, direction, tentativeG, nextBehavior, movementAction);
     }
-    else
-    {
-        return;
-    }
-
-    if (PathQueue_Push(&ctx->nodeFrontier, neighbor))
-        ctx->nodeCount++;
 }
 
 static u8 *ReconstructPath(struct PathNode *targetNode, u8 facingDirection)
@@ -522,31 +507,60 @@ static inline u8 OppositeDirection(u8 direction)
     }
 }
 
-static inline struct PathNode *PathNode_Create(struct PathFinderContext *ctx, s16 x, s16 y, u8 direction, u32 costG)
+static inline void PathNode_CreateStart(struct PathFinderContext *ctx)
+{
+    struct PathNode *node = &ctx->nodeBuffer[ctx->nodeCount];
+    s16 x = ctx->start.x;
+    s16 y = ctx->start.y;
+
+    node->parent = NULL;
+    node->x = x;
+    node->y = y;
+    node->elevation = ctx->objectEvent->currentElevation;
+    node->costG = 0;
+    node->costF = PathNode_ComputeCostH(ctx, x, y);
+    node->movementAction = MOVEMENT_ACTION_NONE;
+    node->originDirection = DIR_NONE;
+    node->currentBehavior = ctx->objectEvent->currentMetatileBehavior;
+
+    PathQueue_Push(&ctx->nodeFrontier, node);
+    ctx->nodeCount++;
+}
+
+static inline void PathNode_CreateNeighbor(struct PathFinderContext *ctx, s16 x, s16 y, u8 direction, u32 costG, u8 currentBehavior, u8 movementAction)
 {
     if (ctx->maxNodes == ctx->nodeCount)
-        return NULL;
+        return;
+
+    u8 elevation = PathNode_GetElevation(ctx->currentNode, x, y);
+    if(PathList_ContainsCoords(&ctx->exploredNodes, x, y, elevation))
+        return;
 
     struct PathNode *node = &ctx->nodeBuffer[ctx->nodeCount];
 
-    u32 costH;
-    u32 distance = ManhattanDistance(x, y, ctx->target.x, ctx->target.y);
-
-    // I don't know why the compiler doesn't optimize this by itself.
-    if (PATH_FINDER_WEIGHT == 1.5)
-        costH = distance + (distance / 2);
-    else
-        costH = PATH_FINDER_WEIGHT * distance;
-
+    node->parent = ctx->currentNode;
     node->x = x;
     node->y = y;
-    node->elevation = PathNode_GetElevation(ctx->currentNode, x, y);
+    node->elevation = elevation;
     node->costG = costG;
-    node->costF = costG + costH;
-    node->parent = ctx->currentNode;
+    node->costF = costG + PathNode_ComputeCostH(ctx, x, y);
+    node->movementAction = movementAction;
     node->originDirection = OppositeDirection(direction);
+    node->currentBehavior = currentBehavior;
 
-    return node;
+    PathQueue_Push(&ctx->nodeFrontier, node);
+    ctx->nodeCount++;
+}
+
+static inline u32 PathNode_ComputeCostH(struct PathFinderContext *ctx, s16 x, s16 y)
+{
+    u32 distance = ManhattanDistance(x, y, ctx->target.x, ctx->target.y);
+
+    // I don't know why the compiler doesn't optimize this itself.
+    if (PATH_FINDER_WEIGHT == 1.5)
+        return distance + (distance / 2);
+    else
+        return PATH_FINDER_WEIGHT * distance;
 }
 
 static inline u8 PathNode_GetElevation(struct PathNode *parent, s16 x, s16 y)
@@ -564,11 +578,11 @@ static inline bool32 PathNode_HasLowerCost(struct PathNode *node1, struct PathNo
     return (node1->costF) < (node2->costF);
 }
 
-static inline bool32 PathNode_Equal(struct PathNode *node1, struct PathNode *node2)
+static inline bool32 PathNode_MatchesCoords(struct PathNode *node1, s16 x, s16 y, u8 elevation)
 {
-    if (node1->x == node2->x &&
-        node1->y == node2->y &&
-        node1->elevation == node2->elevation)
+    if (node1->x == x &&
+        node1->y == y &&
+        node1->elevation == elevation)
     {
         return TRUE;
     }
@@ -576,19 +590,21 @@ static inline bool32 PathNode_Equal(struct PathNode *node1, struct PathNode *nod
     return FALSE;
 }
 
-static inline u32 PathNode_Hash(struct PathNode *node)
+static inline u32 PathNode_Hash(s16 x, s16 y, u8 elevation)
 {
-    u32 x = (u32)((u16)node->x);
-    u32 y = (u32)((u16)node->y);
-    u32 elevation = (u32)node->elevation;
+    u32 localX = (u32)((u16)x);
+    u32 localY = (u32)((u16)y);
+    u32 localElevation = (u32)elevation;
 
     // spatial hash
-    u32 hash = (x * 73856093u) ^ (y * 19349663u) ^ (elevation * 83492791u);
+    u32 hash = (localX * 73856093u) ^ (localY * 19349663u) ^ (localElevation * 83492791u);
 
     // fmix32
     hash ^= (hash >> 16);
     hash *= 0x85ebca6bu;
     hash ^= (hash >> 13);
+    hash *= 0xc2b2ae35u;
+    hash ^= hash >> 16;
 
     return hash;
 }
@@ -744,7 +760,7 @@ static void PathList_Destroy(struct PathList *list)
 
 static bool32 PathList_TryInsert(struct PathList *list, struct PathNode *node, struct PathNode **out)
 {
-    u32 index = PathNode_Hash(node) & list->mask;
+    u32 index = PathNode_Hash(node->x, node->y, node->elevation) & list->mask;
 
     for (u32 i = 0; i < list->capacity; i++)
     {
@@ -758,7 +774,7 @@ static bool32 PathList_TryInsert(struct PathList *list, struct PathNode *node, s
 
             return TRUE;
         }
-        else if (PathNode_Equal(current, node))
+        else if (PathNode_MatchesCoords(current, node->x, node->y, node->elevation))
         {
             *out = current;
             return FALSE;
@@ -770,9 +786,9 @@ static bool32 PathList_TryInsert(struct PathList *list, struct PathNode *node, s
     return FALSE;
 }
 
-static bool32 PathList_HasNode(struct PathList *list, struct PathNode *node)
+static bool32 PathList_ContainsCoords(struct PathList *list, s16 x, s16 y, u8 elevation)
 {
-    u32 index = PathNode_Hash(node) & list->mask;
+    u32 index = PathNode_Hash(x, y, elevation) & list->mask;
 
     for (u32 i = 0; i < list->capacity; i++)
     {
@@ -781,7 +797,7 @@ static bool32 PathList_HasNode(struct PathList *list, struct PathNode *node)
         if (current == NULL)
             return FALSE;
 
-        if (PathNode_Equal(current, node))
+        if (PathNode_MatchesCoords(current, x, y, elevation))
             return TRUE;
 
         index = (index + 1) & list->mask;
