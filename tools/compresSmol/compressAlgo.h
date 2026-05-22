@@ -9,6 +9,7 @@
 #include <thread>
 #include <string>
 #include <bitset>
+#include <array>
 #include "fileDispatcher.h"
 #include "tANS.h"
 
@@ -88,13 +89,16 @@ struct CompressedImage {
     std::vector<unsigned char> loVec;
 };
 
-struct InputSettings {
-    bool canEncodeLO = true;
+struct InputSettings
+{
+    InputSettings() = default;
+    InputSettings(bool canEncodeLO, bool canEncodeSyms, bool canDeltaSyms)
+        : canEncodeLO(canEncodeLO), canEncodeSyms(canEncodeSyms), canDeltaSyms(canDeltaSyms) {}
+
+    bool canEncodeLO   = true;
     bool canEncodeSyms = true;
-    bool canDeltaSyms = true;
-    bool useFrames = false;
-    InputSettings();
-    InputSettings(bool canEncodeLO, bool canEncodeSyms, bool canDeltaSyms);
+    bool canDeltaSyms  = true;
+    bool useFrames     = false;
 };
 
 struct DataVecs {
@@ -102,9 +106,9 @@ struct DataVecs {
     std::vector<unsigned short> symVec;
 };
 
-CompressedImage processImage(std::string fileName, InputSettings settings);
+CompressedImage processImage(const std::string& fileName, InputSettings settings);
 CompressedImage processImageFrames(std::string fileName, InputSettings settings);
-bool processImageData(std::vector<unsigned char> *pInput, CompressedImage *pImage, InputSettings settings, std::string fileName);
+bool processImageData(std::vector<unsigned char> *pInput, CompressedImage *pImage, InputSettings settings, const std::string& fileName);
 
 bool readFileAsUInt(std::string filePath, std::vector<unsigned int> *pFileData);
 
@@ -142,6 +146,6 @@ bool isModeSymDelta(CompressionMode mode);
 void deltaEncode(std::vector<unsigned char> *buffer, int length);
 void deltaDecode(std::vector<unsigned char> *buffer, int length);
 
-std::vector<int> getTestFreqs(std::vector<int> freqs, std::string name);
+std::vector<int> getTestFreqs(std::vector<int> freqs, const std::string& name);
 
 #endif

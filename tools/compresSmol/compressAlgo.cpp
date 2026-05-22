@@ -56,12 +56,12 @@ bool getShortCopies(std::vector<unsigned short> *pInput, size_t minLength, std::
                         checkVec[extraIndex + extraLength] = 'O';
                         extraLength++;
                     }
-                    pShortCopies->push_back(ShortCopy(extraIndex, extraLength, 0, 0));
+                    pShortCopies->emplace_back(extraIndex, extraLength, 0, 0);
                     break;
                 }
             }
 
-            pShortCopies->push_back(ShortCopy(startIndex, longestLength, longestOffset, (*pInput)[startIndex - 1]));
+            pShortCopies->emplace_back(startIndex, longestLength, longestOffset, (*pInput)[startIndex - 1]);
             startIndex += longestLength;
         }
     }
@@ -74,11 +74,11 @@ bool getShortCopies(std::vector<unsigned short> *pInput, size_t minLength, std::
         {
             index = pShortCopies->back().index + pShortCopies->back().length;
             size_t length = checkVec.size() - index;
-            pShortCopies->push_back(ShortCopy(index, length, 0, 0));
+            pShortCopies->emplace_back(index, length, 0, 0);
         }
         else
         {
-            pShortCopies->push_back(ShortCopy(0, checkVec.size(), 0, 0));
+            pShortCopies->emplace_back(0, checkVec.size(), 0, 0);
         }
     }
 
@@ -319,7 +319,7 @@ std::vector<unsigned int> getFreqWriteInts(std::vector<int> input)
     return returnVec;
 }
 
-std::vector<int> getTestFreqs(std::vector<int> freqs, std::string name)
+std::vector<int> getTestFreqs(std::vector<int> freqs, const std::string& name)
 {
     if (name.find("test/compression/table_") == std::string::npos)
         return freqs;
@@ -1107,16 +1107,7 @@ void readRawDataVecs(std::vector<unsigned int> *pInput, std::vector<unsigned sho
     *pOutput = decodeBytesShort(&loVec, &symVec);
 }
 
-InputSettings::InputSettings() {}
-
-InputSettings::InputSettings(bool canEncodeLO, bool canEncodeSyms, bool canDeltaSyms)
-{
-    this->canEncodeLO = canEncodeLO;
-    this->canEncodeSyms = canEncodeSyms;
-    this->canDeltaSyms = canDeltaSyms;
-}
-
-bool readFileAsUC(std::string filePath, std::vector<unsigned char> *pFileData)
+bool readFileAsUC(const std::string& filePath, std::vector<unsigned char> *pFileData)
 {
     std::ifstream iStream;
     iStream.open(filePath.c_str(), std::ios::binary);
@@ -1156,19 +1147,23 @@ bool readFileAsUInt(std::string filePath, std::vector<unsigned int> *pFileData)
     return true;
 }
 
-CompressedImage processImage(std::string fileName, InputSettings settings)
+CompressedImage processImage(const std::string& fileName, InputSettings settings)
 {
     CompressedImage image;
     std::vector<unsigned char> input;
+
     if (!readFileAsUC(fileName, &input))
     {
         fprintf(stderr, "ERROR: Couldn't read file %s\n", fileName.c_str());
         return image;
     }
+
     if (!processImageData(&input, &image, settings, fileName))
     {
         fprintf(stderr, "ERROR: No valid compression could be generated for image %s\n", fileName.c_str());
+        return image;
     }
+
     return image;
 }
 
@@ -1179,7 +1174,7 @@ CompressedImage processImageFrames(std::string fileName, InputSettings settings)
     return image;
 }
 
-bool processImageData(std::vector<unsigned char> *pInput, CompressedImage *pImage, InputSettings settings, std::string fileName)
+bool processImageData(std::vector<unsigned char> *pInput, CompressedImage *pImage, InputSettings settings, const std::string& fileName)
 {
     CompressionMode someMode;
     bool hasImage = false;
