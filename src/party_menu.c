@@ -2119,14 +2119,17 @@ static void GiveItemToMon(struct Pokemon *mon, enum Item item)
     TryItemHoldFormChange(&gParties[B_TRAINER_PLAYER][gPartyMenu.slotId], gPartyMenu.slotId, B_TRAINER_PLAYER);
 }
 
-static u8 TryTakeMonItem(struct Pokemon *mon)
+u8 TryTakeMonItem(struct Pokemon *mon)
 {
     enum Item item = GetMonData(mon, MON_DATA_HELD_ITEM);
 
     if (item == ITEM_NONE)
         return 0;
-    if (AddBagItem(item, 1) == FALSE)
+    /*
+        if (AddBagItem(item, 1) == FALSE)
         return 1;
+    */
+    //ensures no items are added to the bag. badabing bada bag
 
     item = ITEM_NONE;
     SetMonData(mon, MON_DATA_HELD_ITEM, &item);
@@ -3509,7 +3512,7 @@ static void Task_GiveHoldItem(u8 taskId)
         item = gSpecialVar_ItemId;
         DisplayGaveHeldItemMessage(&gParties[B_TRAINER_PLAYER][gPartyMenu.slotId], item, FALSE, 0);
         GiveItemToMon(&gParties[B_TRAINER_PLAYER][gPartyMenu.slotId], item);
-        RemoveBagItem(item, 1);
+        //RemoveBagItem(item, 1);
         gTasks[taskId].func = Task_UpdateHeldItemSprite;
     }
 }
@@ -3537,12 +3540,12 @@ static void Task_HandleSwitchItemsYesNoInput(u8 taskId)
     switch (Menu_ProcessInputNoWrapClearOnChoose())
     {
     case 0: // Yes, switch items
-        RemoveBagItem(gSpecialVar_ItemId, 1);
+        //RemoveBagItem(gSpecialVar_ItemId, 1);
 
         // No room to return held item to bag
-        if (AddBagItem(sPartyMenuItemId, 1) == FALSE)
+        if (GetItemPocket(sPartyMenuItemId) >= POCKETS_COUNT)
         {
-            AddBagItem(gSpecialVar_ItemId, 1);
+            //AddBagItem(gSpecialVar_ItemId, 1);
             BufferBagFullCantTakeItemMessage(sPartyMenuItemId);
             DisplayPartyMenuMessage(gStringVar4, FALSE);
             gTasks[taskId].func = Task_ReturnToChooseMonAfterText;
@@ -7119,7 +7122,7 @@ static void GiveItemToSelectedMon(u8 taskId)
         item = gPartyMenu.bagItem;
         DisplayGaveHeldItemMessage(&gParties[B_TRAINER_PLAYER][gPartyMenu.slotId], item, FALSE, 1);
         GiveItemToMon(&gParties[B_TRAINER_PLAYER][gPartyMenu.slotId], item);
-        RemoveBagItem(item, 1);
+        // RemoveBagItem(item, 1);
         gTasks[taskId].func = Task_UpdateHeldItemSpriteAndClosePartyMenu;
     }
 }
@@ -7198,10 +7201,10 @@ static void Task_HandleSwitchItemsFromBagYesNoInput(u8 taskId)
     {
     case 0: // Yes, switch items
         item = gPartyMenu.bagItem;
-        RemoveBagItem(item, 1);
-        if (AddBagItem(sPartyMenuItemId, 1) == FALSE)
+        //RemoveBagItem(item, 1);
+        if (GetItemPocket(sPartyMenuItemId) >= POCKETS_COUNT)
         {
-            ReturnGiveItemToBagOrPC(item);
+            //ReturnGiveItemToBagOrPC(item);
             BufferBagFullCantTakeItemMessage(sPartyMenuItemId);
             DisplayPartyMenuMessage(gStringVar4, FALSE);
             gTasks[taskId].func = Task_UpdateHeldItemSpriteAndClosePartyMenu;

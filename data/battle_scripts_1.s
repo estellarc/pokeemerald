@@ -2875,8 +2875,8 @@ BattleScript_LocalBattleWonLoseTexts::
 	waitstate
 	printstring STRINGID_TRAINER2LOSETEXT
 BattleScript_LocalBattleWonReward::
-	getmoneyreward
-	printstring STRINGID_PLAYERGOTMONEY
+	@ getmoneyreward
+	@ printstring STRINGID_PLAYERGOTMONEY
 	waitmessage B_WAIT_TIME_LONG
 BattleScript_PayDayMoneyAndPickUpItems::
 	givepaydaymoney
@@ -2906,7 +2906,7 @@ BattleScript_LocalBattleLost::
 	jumpifnowhiteout BattleScript_LocalBattleLostEnd_
 	jumpifbattletype BATTLE_TYPE_INGAME_PARTNER, BattleScript_LocalBattleLostPrintWhiteOut
 BattleScript_LocalBattleLostPrintWhiteOut::
-	getmoneyreward
+	@ getmoneyreward
 	printstring STRINGID_PLAYERWHITEOUT
 	waitmessage B_WAIT_TIME_LONG
 .if B_WHITEOUT_MONEY >= GEN_4
@@ -2917,8 +2917,8 @@ BattleScript_LocalBattleLostPrintWhiteOut::
 	waitmessage B_WAIT_TIME_LONG
 	end2
 BattleScript_LocalBattleLostEnd::
-	printstring STRINGID_PLAYERWHITEOUT2_TRAINER
-	waitmessage B_WAIT_TIME_LONG
+	@ printstring STRINGID_PLAYERWHITEOUT2_TRAINER
+	@ waitmessage B_WAIT_TIME_LONG
 	printstring STRINGID_PLAYERWHITEOUT3
 	waitmessage B_WAIT_TIME_LONG
 	end2
@@ -6222,12 +6222,12 @@ BattleScript_QuestionForfeitBattle::
 	endselectionscript
 
 BattleScript_ForfeitBattleGaveMoney::
-	getmoneyreward
-.if B_WHITEOUT_MONEY >= GEN_4
-	printstring STRINGID_PLAYERWHITEOUT2_TRAINER
-.else
+	@ getmoneyreward
+@ .if B_WHITEOUT_MONEY >= GEN_4
+	@ printstring STRINGID_PLAYERWHITEOUT2_TRAINER
+@ .else
 	printstring STRINGID_PLAYERWHITEOUT3
-.endif
+@ .endif
 	waitmessage B_WAIT_TIME_LONG
 	end2
 

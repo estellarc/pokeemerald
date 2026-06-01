@@ -18,12 +18,16 @@ EventScript_ObtainItemMessage::
 
 EventScript_BufferPocketNameAndTryFanfare::
 	switch VAR_RESULT
-	case POCKET_ITEMS,      EventScript_BufferItemsPocket
+	case POCKET_HELD_ITEMS,      EventScript_BufferItemsPocket
 	case POCKET_KEY_ITEMS,  EventScript_BufferKeyItemsPocket
-	case POCKET_POKE_BALLS, EventScript_BufferPokeballsPocket
+	case POCKET_CONSUMABLES, EventScript_BufferPokeballsPocket
 	case POCKET_TM_HM,      EventScript_BufferTMHMsPocket
 	case POCKET_BERRIES,    EventScript_BufferBerriesPocket
+	case POCKET_DUMMY,		EventScript_BufferDummyPocket @ to the void with you!
 	end
+
+EventScript_BufferDummyPocket::
+	return
 
 EventScript_BufferItemsPocket::
 	bufferstdstring STR_VAR_3, STDSTRING_ITEMS
@@ -251,12 +255,16 @@ Std_PutItemAway::
 
 EventScript_BufferPutAwayPocketName::
 	switch VAR_RESULT
-	case POCKET_ITEMS,       EventScript_BufferPutAwayPocketItems
+	case POCKET_HELD_ITEMS,       EventScript_BufferPutAwayPocketItems
 	case POCKET_KEY_ITEMS,   EventScript_BufferPutAwayPocketKeyItems
-	case POCKET_POKE_BALLS,  EventScript_BufferPutAwayPocketPokeBalls
+	case POCKET_CONSUMABLES,  EventScript_BufferPutAwayPocketPokeBalls
 	case POCKET_TM_HM,     EventScript_BufferPutAwayPocketTMCase
 	case POCKET_BERRIES, EventScript_BufferPutAwayPocketBerryPouch
+	case POCKET_DUMMY, EventScript_BufferPutAwayPocketDummy
 	end
+
+EventScript_BufferPutAwayPocketDummy::
+	return
 
 EventScript_BufferPutAwayPocketItems::
 	bufferstdstring STR_VAR_3, STDSTRING_ITEMS
