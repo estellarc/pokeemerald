@@ -118,9 +118,9 @@ EWRAM_DATA u8 gAreaTimeOfDay = 0;
 
 static void FindMapsWithMon(enum Species);
 static void BuildAreaGlowTilemap(void);
-static void SetAreaHasMon(u16, u16);
-static void SetSpecialMapHasMon(u16, u16);
-static mapsec_u16_t GetRegionMapSectionId(u8, u8);
+// static void SetAreaHasMon(u16, u16);
+// static void SetSpecialMapHasMon(u16, u16);
+// static mapsec_u16_t GetRegionMapSectionId(u8, u8);
 static bool8 MapHasSpecies(const struct WildEncounterTypes *, u32, enum Species);
 static bool8 MonListHasSpecies(const struct WildPokemonInfo *, enum Species, u16);
 static void DoAreaGlow(void);
@@ -319,13 +319,12 @@ static void FindMapsWithMon(enum Species species)
             {
             case MAP_GROUP_TOWNS_AND_ROUTES:
             case MAP_GROUP_TOWNS_AND_ROUTES_FRLG:
-                SetAreaHasMon(sFeebasData[i][1], sFeebasData[i][2]);
-                break;
+            break;
             case MAP_GROUP_DUNGEONS:
             case MAP_GROUP_DUNGEONS_FRLG:
             case MAP_GROUP_SPECIAL_AREA:
-            case MAP_GROUP_SPECIAL_AREA_FRLG:
-                SetSpecialMapHasMon(sFeebasData[i][1], sFeebasData[i][2]);
+                // SetAreaHasMon(sFeebasData[i][1], sFeebasData[i][2]);
+                // SetSpecialMapHasMon(sFeebasData[i][1], sFeebasData[i][2]);
                 break;
             }
         }
@@ -346,13 +345,11 @@ static void FindMapsWithMon(enum Species species)
             {
             case MAP_GROUP_TOWNS_AND_ROUTES:
             case MAP_GROUP_TOWNS_AND_ROUTES_FRLG:
-                SetAreaHasMon(gWildMonHeaders[i].mapGroup, gWildMonHeaders[i].mapNum);
-                break;
             case MAP_GROUP_DUNGEONS:
             case MAP_GROUP_DUNGEONS_FRLG:
             case MAP_GROUP_SPECIAL_AREA:
-            case MAP_GROUP_SPECIAL_AREA_FRLG:
-                SetSpecialMapHasMon(gWildMonHeaders[i].mapGroup, gWildMonHeaders[i].mapNum);
+                // SetAreaHasMon(gWildMonHeaders[i].mapGroup, gWildMonHeaders[i].mapNum);
+                // SetSpecialMapHasMon(gWildMonHeaders[i].mapGroup, gWildMonHeaders[i].mapNum);
                 break;
             }
         }
@@ -372,7 +369,7 @@ static void FindMapsWithMon(enum Species species)
         }
     }
 }
-
+/*
 static void SetAreaHasMon(u16 mapGroup, u16 mapNum)
 {
     if (sPokedexAreaScreen->numOverworldAreas < MAX_AREA_HIGHLIGHTS)
@@ -423,11 +420,11 @@ static void SetSpecialMapHasMon(u16 mapGroup, u16 mapNum)
         }
     }
 }
-
 static mapsec_u16_t GetRegionMapSectionId(u8 mapGroup, u8 mapNum)
 {
     return Overworld_GetMapHeaderByGroupAndId(mapGroup, mapNum)->regionMapSectionId;
 }
+*/
 
 static bool8 MapHasSpecies(const struct WildEncounterTypes *info, u32 headerSectionId, enum Species species)
 {

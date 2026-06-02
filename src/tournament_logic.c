@@ -239,7 +239,7 @@ void Script_goto_pwt_battle_script(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    ScriptJump(ctx, sPWTBattleScripts[trainerId]);
+    ScriptCall(ctx, sPWTBattleScripts[trainerId]);
 }
 
 void SetCompleteRosterFlag(void) {
