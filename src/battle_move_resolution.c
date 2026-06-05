@@ -1415,6 +1415,7 @@ static enum CancelerResult CancelerMoveEffectFailureTarget(struct BattleCalcValu
             break;
         }
         case EFFECT_LOW_KICK:
+        case EFFECT_SINKHOLE:
         case EFFECT_HEAT_CRASH:
             if (GetActiveGimmick(battlerDef) == GIMMICK_DYNAMAX)
             {
@@ -3640,6 +3641,18 @@ static enum MoveEndResult MoveEndMoveBlock(struct BattleCalcValues *cv)
             result = MOVEEND_RESULT_RUN_SCRIPT;
         }
         break;
+    case EFFECT_STORM_SACRIFICE:
+        if (IsBattlerAlive(cv->battlerAtk)
+         && !IsBattlerAlive(cv->battlerDef)
+         && IsAnyTargetTurnDamaged(cv->battlerAtk, EXCLUDING_SUBSTITUTES)
+         && !NoAliveMonsForEitherParty()
+         && TryChangeBattleWeather(cv->battlerAtk, BATTLE_WEATHER_RAIN, ABILITY_NONE))
+        {
+            gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_STARTED_RAIN;
+            BattleScriptCall(BattleScript_MoveEffectSetWeather);
+            result = MOVEEND_RESULT_RUN_SCRIPT;
+        }
+        break;
     default:
         result = MOVEEND_RESULT_CONTINUE;
         break;
@@ -4896,6 +4909,12 @@ static void SetSameMoveTurnValues(enum BattleMoveEffects moveEffect)
     case EFFECT_FURY_CUTTER:
         if (increment && gBattleMons[gBattlerAttacker].volatiles.furyCutterCounter < 5)
             gBattleMons[gBattlerAttacker].volatiles.furyCutterCounter++;
+        else
+            gBattleMons[gBattlerAttacker].volatiles.furyCutterCounter = 0;
+        break;
+    case EFFECT_RAZZLE_DAZZLE:
+        if (increment)
+            gBattleMons[gBattlerAttacker].volatiles.furyCutterCounter = min(gBattleMons[gBattlerAttacker].volatiles.furyCutterCounter + 1, 2);
         else
             gBattleMons[gBattlerAttacker].volatiles.furyCutterCounter = 0;
         break;

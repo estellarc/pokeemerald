@@ -715,6 +715,10 @@ const u8 *const gBattleStringsTable[STRINGID_COUNT] =
     [STRINGID_STRONGWINDSDISSIPATED]                = COMPOUND_STRING("The mysterious strong winds have dissipated!"),
     [STRINGID_MYSTERIOUSAIRCURRENTBLOWSON]          = COMPOUND_STRING("The mysterious strong winds blow on regardless!"),
     [STRINGID_ATTACKWEAKENEDBSTRONGWINDS]           = COMPOUND_STRING("The mysterious strong winds weakened the attack!"),
+    [STRINGID_WINDSTORMSTARTED]                     = COMPOUND_STRING("A windstorm kicked up!"),
+    [STRINGID_WINDSTORMRAGES]                       = COMPOUND_STRING("The windstorm is raging."),
+    [STRINGID_WINDSTORMSUBSIDED]                    = COMPOUND_STRING("The windstorm subsided."),
+    [STRINGID_ATTACKWEAKENEDBYWINDSTORM]            = COMPOUND_STRING("The windstorm weakened the attack!"),
     [STRINGID_STUFFCHEEKSCANTSELECT]                = COMPOUND_STRING("It can't use the move because it doesn't have a Berry!\p"),
     [STRINGID_PKMNREVERTEDTOPRIMAL]                 = COMPOUND_STRING("{B_SCR_NAME_WITH_PREFIX}'s Primal Reversion! It reverted to its primal state!"),
     [STRINGID_BUTPOKEMONCANTUSETHEMOVE]             = COMPOUND_STRING("But {B_ATK_NAME_WITH_PREFIX2} can't use the move!"),
@@ -727,6 +731,7 @@ const u8 *const gBattleStringsTable[STRINGID_COUNT] =
     [STRINGID_BOTHCANNOLONGERESCAPE]                = COMPOUND_STRING("Neither Pokémon can run away!"),
     [STRINGID_CANTESCAPEDUETOUSEDMOVE]              = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX} can no longer escape because it used No Retreat!"),
     [STRINGID_PKMNBECAMEWEAKERTOFIRE]               = COMPOUND_STRING("{B_DEF_NAME_WITH_PREFIX} became weaker to fire!"),
+    [STRINGID_PKMNBECAMEWEAKERTOICE]                = COMPOUND_STRING("{B_DEF_NAME_WITH_PREFIX} became weaker to ice!"),
     [STRINGID_ABOUTTOUSEPOLTERGEIST]                = COMPOUND_STRING("{B_EFF_NAME_WITH_PREFIX} is about to be attacked by its {B_LAST_ITEM}!"),
     [STRINGID_CANTESCAPEBECAUSEOFCURRENTMOVE]       = COMPOUND_STRING("{B_DEF_NAME_WITH_PREFIX} can no longer escape because of Octolock!"),
     [STRINGID_NEUTRALIZINGGASENTERS]                = COMPOUND_STRING("Neutralizing gas filled the area!"),
@@ -796,6 +801,9 @@ const u8 *const gBattleStringsTable[STRINGID_COUNT] =
     [STRINGID_SHARPSTEELDMG]                        = COMPOUND_STRING("The sharp steel bit into {B_DEF_NAME_WITH_PREFIX2}!"),
     [STRINGID_PKMNBLEWAWAYSHARPSTEEL]               = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX} blew away sharp steel!"),
     [STRINGID_SHARPSTEELDISAPPEAREDFROMTEAM]        = COMPOUND_STRING("The pieces of steel surrounding {B_ATK_TEAM2} Pokémon disappeared!"),
+    [STRINGID_ICERINKSET]                           = COMPOUND_STRING("The ground around {B_DEF_TEAM2} team froze over!"),
+    [STRINGID_PKMNSLIDONICE]                        = COMPOUND_STRING("{B_EFF_NAME_WITH_PREFIX} slid on the ice!"),
+    [STRINGID_ICERINKMELTED]                        = COMPOUND_STRING("The ice around {B_ATK_TEAM2} team melted away!"),
     [STRINGID_TEAMTRAPPEDWITHVINES]                 = COMPOUND_STRING("{B_EFF_TEAM1} Pokémon got trapped with vines!"),
     [STRINGID_PKMNHURTBYVINES]                      = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX} is hurt by G-Max Vine Lash's ferocious beating!"),
     [STRINGID_TEAMCAUGHTINVORTEX]                   = COMPOUND_STRING("{B_EFF_TEAM1} Pokémon got caught in a vortex of water!"),
@@ -935,6 +943,7 @@ const u16 gStartingStatusStringIds[B_MSG_STARTING_STATUS_COUNT] =
     [B_MSG_SET_STICKY_WEB]       = STRINGID_STICKYWEBUSED,
     [B_MSG_SET_STEALTH_ROCK]     = STRINGID_POINTEDSTONESFLOAT,
     [B_MSG_SET_SHARP_STEEL]      = STRINGID_SHARPSTEELFLOATS,
+    [B_MSG_SET_ICE_RINK]         = STRINGID_ICERINKSET,
 };
 
 const u16 gTerrainStringIds[B_MSG_TERRAIN_COUNT] =
@@ -1012,6 +1021,7 @@ const u16 gMoveWeatherChangeStringIds[] =
     [B_MSG_STARTED_HAIL]      = STRINGID_STARTEDHAIL,
     [B_MSG_STARTED_SNOW]      = STRINGID_STARTEDSNOW,
     [B_MSG_STARTED_FOG]       = STRINGID_FOGCREPTUP, // Unused, can use for custom moves that set fog
+    [B_MSG_STARTED_WINDSTORM] = STRINGID_WINDSTORMSTARTED,
 };
 
 const u16 gAbilityWeatherChangeStringId[] =
@@ -1024,6 +1034,7 @@ const u16 gAbilityWeatherChangeStringId[] =
     [B_MSG_STARTED_DESOLATE_LAND]  = STRINGID_EXTREMELYHARSHSUNLIGHT,
     [B_MSG_STARTED_PRIMORDIAL_SEA] = STRINGID_HEAVYRAIN,
     [B_MSG_STARTED_STRONG_WINDS]   = STRINGID_MYSTERIOUSAIRCURRENT,
+    [B_MSG_STARTED_WINDSTORM_ABILITY] = STRINGID_WINDSTORMSTARTED,
 };
 
 const u16 gWeatherEndsStringIds[B_MSG_WEATHER_END_COUNT] =
@@ -1037,6 +1048,7 @@ const u16 gWeatherEndsStringIds[B_MSG_WEATHER_END_COUNT] =
     [B_MSG_WEATHER_END_EXTREMELY_HARSH_SUNLIGHT]   = STRINGID_EXTREMESUNLIGHTFADED,
     [B_MSG_WEATHER_END_HEAVY_RAIN]                 = STRINGID_HEAVYRAINLIFTED,
     [B_MSG_WEATHER_END_STRONG_WINDS]               = STRINGID_STRONGWINDSDISSIPATED,
+    [B_MSG_WEATHER_END_WINDSTORM]                  = STRINGID_WINDSTORMSUBSIDED,
 };
 
 const u16 gWeatherTurnStringIds[] =
@@ -1049,6 +1061,7 @@ const u16 gWeatherTurnStringIds[] =
     [B_MSG_WEATHER_TURN_SNOW]         = STRINGID_SNOWCONTINUES,
     [B_MSG_WEATHER_TURN_FOG]          = STRINGID_FOGISDEEP,
     [B_MSG_WEATHER_TURN_STRONG_WINDS] = STRINGID_MYSTERIOUSAIRCURRENTBLOWSON,
+    [B_MSG_WEATHER_TURN_WINDSTORM]    = STRINGID_WINDSTORMRAGES,
 };
 
 const u16 gSandStormHailDmgStringIds[] =
@@ -1402,6 +1415,7 @@ const u16 gRemoveHazardsStringIds[] =
     [HAZARDS_TOXIC_SPIKES] = STRINGID_TOXICSPIKESDISAPPEAREDFROMTEAM,
     [HAZARDS_STEALTH_ROCK] = STRINGID_STEALTHROCKDISAPPEAREDFROMTEAM,
     [HAZARDS_STEELSURGE] = STRINGID_SHARPSTEELDISAPPEAREDFROMTEAM,
+    [HAZARDS_ICE_RINK] = STRINGID_ICERINKMELTED,
 };
 
 const u16 gZenModeStringIds[] =
@@ -2953,7 +2967,7 @@ static const u8 *BattleStringGetOpponentNameByTrainerId(u16 trainerId, u8 *text,
             toCpy = GetTrainerNameFromId(trainerId);
     }
 
-    assertf(DoesStringProperlyTerminate(toCpy, TRAINER_NAME_LENGTH + 1),"Opponent needs a valid name")
+    assertf(toCpy != NULL && trainerId != TRAINER_NONE && trainerId != 0xFFFF, "Opponent needs a valid name")
     {
         return sText_EmptyString4;
     }

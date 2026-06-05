@@ -1286,6 +1286,19 @@ static inline bool32 TryStrongWindsWeakenAttack(enum BattlerId battlerDef, enum 
         }
     }
 
+    if (GetWeather() & B_WEATHER_WINDSTORM)
+    {
+        if (GetMoveCategory(gCurrentMove) != DAMAGE_CATEGORY_STATUS
+         && IS_BATTLER_OF_TYPE(battlerDef, TYPE_FLYING)
+         && gTypeEffectivenessTable[moveType][TYPE_FLYING] >= UQ_4_12(2.0)
+         && !gBattleStruct->printedStrongWindsWeakenedAttack)
+        {
+            gBattleStruct->printedStrongWindsWeakenedAttack = TRUE;
+            BattleScriptCall(BattleScript_AttackWeakenedByWindstorm);
+            return TRUE;
+        }
+    }
+
     return FALSE;
 }
 
@@ -1684,6 +1697,8 @@ static void MoveDamageDataHpUpdate(enum BattlerId battler, u32 scriptBattler, co
     }
 
     GetBattlerPartyState(battler)->timesGotHit++;
+    if (!IsBattlerAlly(battler, gBattlerAttacker) && gProtectStructs[battler].auraFarmingHits < 3)
+        gProtectStructs[battler].auraFarmingHits++;
     gSpecialStatuses[battler].damagedByAttack = TRUE;
 }
 
@@ -2284,6 +2299,7 @@ static inline bool32 IgnoreTargetingForMoveEffect(enum MoveEffect moveEffect) //
     case MOVE_EFFECT_RAINBOW:
     case MOVE_EFFECT_SEA_OF_FIRE:
     case MOVE_EFFECT_SWAMP:
+    case MOVE_EFFECT_SUNBLOOM:
         return TRUE;
     default:
         return FALSE;
@@ -2385,6 +2401,21 @@ void SetMoveEffect(enum BattlerId battlerAtk, enum BattlerId effectBattler, enum
             gBattleMons[effectBattler].volatiles.confusionTurns = RandomUniform(RNG_CONFUSION_TURNS, 2, B_CONFUSION_TURNS); // 2-5 turns
             BattleScriptPush(battleScript);
             gBattlescriptCurrInstr = BattleScript_MoveEffectConfusion;
+        }
+        break;
+    case MOVE_EFFECT_INFATUATION:
+        if (gBattleMons[effectBattler].volatiles.infatuation
+         || abilities[effectBattler] == ABILITY_OBLIVIOUS
+         || IsAbilityOnSide(effectBattler, ABILITY_AROMA_VEIL)
+         || !AreBattlersOfOppositeGender(battlerAtk, effectBattler))
+        {
+            gBattlescriptCurrInstr = battleScript;
+        }
+        else
+        {
+            gBattleMons[effectBattler].volatiles.infatuation = INFATUATED_WITH(battlerAtk);
+            BattleScriptPush(battleScript);
+            gBattlescriptCurrInstr = BattleScript_MoveEffectInfatuation;
         }
         break;
     case MOVE_EFFECT_FLINCH:
@@ -2542,6 +2573,8 @@ void SetMoveEffect(enum BattlerId battlerAtk, enum BattlerId effectBattler, enum
             gBattleMons[effectBattler].volatiles.escapePrevention = TRUE;
             gBattleMons[effectBattler].volatiles.battlerPreventingEscape = battlerAtk;
         }
+        if (MoveSetsStrictEscapePrevention(gCurrentMove))
+            gBattleMons[effectBattler].volatiles.strictEscapePrevention = TRUE;
         gBattlescriptCurrInstr = battleScript;
         break;
     case MOVE_EFFECT_NIGHTMARE:
@@ -2724,6 +2757,13 @@ void SetMoveEffect(enum BattlerId battlerAtk, enum BattlerId effectBattler, enum
         {
             static const u8 sDireClawEffects[] = { MOVE_EFFECT_POISON, MOVE_EFFECT_PARALYSIS, MOVE_EFFECT_SLEEP };
             SetMoveEffect(battlerAtk, effectBattler, RandomElement(RNG_DIRE_CLAW, sDireClawEffects), battleScript, effectFlags);
+        }
+        break;
+    case MOVE_EFFECT_GRASSPIERCER:
+        if (!gBattleMons[effectBattler].status1)
+        {
+            static const u8 sGrasspiercerEffects[] = { MOVE_EFFECT_TOXIC, MOVE_EFFECT_PARALYSIS, MOVE_EFFECT_SLEEP };
+            SetMoveEffect(battlerAtk, effectBattler, RandomElement(RNG_DIRE_CLAW, sGrasspiercerEffects), battleScript, effectFlags);
         }
         break;
     case MOVE_EFFECT_STEALTH_ROCK:
@@ -3045,6 +3085,29 @@ void SetMoveEffect(enum BattlerId battlerAtk, enum BattlerId effectBattler, enum
         gSideTimers[i].swampTimer = 4;
         BattleScriptPush(battleScript);
         gBattlescriptCurrInstr = BattleScript_TheSwampActivates;
+        break;
+    case MOVE_EFFECT_SUNBLOOM:
+        if (TryChangeBattleWeather(battlerAtk, BATTLE_WEATHER_SUN, ABILITY_NONE))
+        {
+            if (gBattleMons[gBattlerTarget].hp == 0 && !(gBattleWeather & B_WEATHER_PRIMAL_ANY))
+                gBattleStruct->weatherDuration = 8;
+            gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_STARTED_SUNLIGHT;
+            BattleScriptPush(battleScript);
+            gBattlescriptCurrInstr = BattleScript_MoveEffectSetWeather;
+        }
+        break;
+    case MOVE_EFFECT_OVEREXPOSURE:
+        if (GetBattlerPartyState(effectBattler)->overexposed)
+        {
+            gBattlescriptCurrInstr = battleScript;
+        }
+        else
+        {
+            GetBattlerPartyState(effectBattler)->overexposed = TRUE;
+            gBattleMons[effectBattler].volatiles.overexposure = TRUE;
+            BattleScriptPush(battleScript);
+            gBattlescriptCurrInstr = BattleScript_OverexposureMessage;
+        }
         break;
     case MOVE_EFFECT_SUN:
     case MOVE_EFFECT_RAIN:
@@ -5168,7 +5231,8 @@ static void Cmd_jumpifcantswitch(void)
     CMD_ARGS(u8 battler:7, u8 ignoreEscapePrevention:1, const u8 *jumpInstr);
 
     enum BattlerId battler = GetBattlerForBattleScript(cmd->battler);
-    if (!cmd->ignoreEscapePrevention && !CanBattlerEscape(battler) && GetBattlerHoldEffect(battler) != HOLD_EFFECT_SHED_SHELL)
+    if (gBattleMons[battler].volatiles.strictEscapePrevention
+     || (!cmd->ignoreEscapePrevention && !CanBattlerEscape(battler) && GetBattlerHoldEffect(battler) != HOLD_EFFECT_SHED_SHELL))
     {
         gBattlescriptCurrInstr = cmd->jumpInstr;
     }
@@ -6712,6 +6776,8 @@ static void RemoveAllWeather(void)
         gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_WEATHER_END_HAIL;
     else if (gBattleWeather & B_WEATHER_STRONG_WINDS)
         gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_WEATHER_END_STRONG_WINDS;
+    else if (gBattleWeather & B_WEATHER_WINDSTORM)
+        gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_WEATHER_END_WINDSTORM;
     else if (gBattleWeather & B_WEATHER_SNOW)
         gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_WEATHER_END_SNOW;
     else if (gBattleWeather & B_WEATHER_FOG)
@@ -12691,6 +12757,22 @@ void BS_SetSteelsurge(void)
     else
     {
         PushHazardTypeToQueue(targetSide, HAZARDS_STEELSURGE);
+        gBattlescriptCurrInstr = cmd->nextInstr;
+    }
+}
+
+// Freezes the ground beneath the target's side.
+void BS_SetIceRink(void)
+{
+    NATIVE_ARGS(const u8 *failInstr);
+    u8 targetSide = GetBattlerSide(gBattlerTarget);
+    if (IsHazardOnSide(targetSide, HAZARDS_ICE_RINK))
+    {
+        gBattlescriptCurrInstr = cmd->failInstr;
+    }
+    else
+    {
+        PushHazardTypeToQueue(targetSide, HAZARDS_ICE_RINK);
         gBattlescriptCurrInstr = cmd->nextInstr;
     }
 }

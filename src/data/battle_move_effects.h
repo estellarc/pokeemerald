@@ -1900,4 +1900,61 @@ const struct BattleMoveEffect gBattleMoveEffects[NUM_BATTLE_MOVE_EFFECTS] =
         .battleScript = BattleScript_EffectHit,
         .battleTvScore = 0, // TODO: Assign points
     },
+
+    [EFFECT_SINKHOLE] =
+    {
+        .battleScript = BattleScript_EffectHit,
+        .battleTvScore = 0, // TODO: Assign points
+    },
+
+    [EFFECT_AURA_FARMING] =
+    {
+        .battleScript = BattleScript_EffectHit,
+        .battleTvScore = 0, // TODO: Assign points
+    },
+
+    [EFFECT_RAZZLE_DAZZLE] =
+    {
+        .battleScript = BattleScript_EffectHit,
+        .battleTvScore = 0, // TODO: Assign points
+    },
+
+    [EFFECT_STEELSURGE] =
+    {
+        .battleScript = BattleScript_EffectSteelsurge,
+        .battleTvScore = 0, // TODO: Assign points
+        .encourageEncore = TRUE,
+    },
+
+    [EFFECT_PSYCHE_LOCK] =
+    {
+        .battleScript = BattleScript_EffectPsycheLock,
+        .battleTvScore = 5,
+        .battleFactoryStyle = FACTORY_STYLE_SLOW_STEADY,
+    },
+
+    [EFFECT_FUSSY_FUSS] =
+    {
+        .battleScript = BattleScript_EffectHit,
+        .battleTvScore = 0, // TODO: Assign points
+    },
+
+    [EFFECT_CRASHING_FIST] =
+    {
+        .battleScript = BattleScript_EffectHit,
+        .battleTvScore = 0, // TODO: Assign points
+    },
+
+    [EFFECT_ICE_RINK] =
+    {
+        .battleScript = BattleScript_EffectIceRink,
+        .battleTvScore = 0, // TODO: Assign points
+        .encourageEncore = TRUE,
+    },
+
+    [EFFECT_STORM_SACRIFICE] =
+    {
+        .battleScript = BattleScript_EffectHit,
+        .battleTvScore = 0, // TODO: Assign points
+    },
 };

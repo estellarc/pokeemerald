@@ -143,12 +143,15 @@ struct MoveInfo
     bool32 forcePressure:1;
     bool32 cantUseTwice:1;
     bool32 alwaysHitsInRain:1;
+    bool32 alwaysHitsInSun:1;
     bool32 accuracy50InSun:1;
     bool32 alwaysHitsInHailSnow:1;
     bool32 alwaysHitsOnSameType:1; // Always hits if user is of same type as move
     bool32 noAffectOnSameTypeTarget:1; // Fails if target is of same type as move
     bool32 accIncreaseByTenOnSameType:1; // Accuracy is increased by 10% if user is of same type as move
-    bool32 padding1:15;
+    bool32 ignoresResistancesIfUserPoison:1;
+    bool32 setsStrictEscapePrevention:1;
+    bool32 padding1:12;
     // end of word
 
     // Ban flags
@@ -477,6 +480,11 @@ static inline bool32 MoveAlwaysHitsInRain(enum Move moveId)
     return gMovesInfo[SanitizeMoveId(moveId)].alwaysHitsInRain;
 }
 
+static inline bool32 MoveAlwaysHitsInSun(enum Move moveId)
+{
+    return gMovesInfo[SanitizeMoveId(moveId)].alwaysHitsInSun;
+}
+
 static inline bool32 MoveHas50AccuracyInSun(enum Move moveId)
 {
     return gMovesInfo[SanitizeMoveId(moveId)].accuracy50InSun;
@@ -508,6 +516,16 @@ static inline bool32 MoveHasNoEffectOnSameType(enum Move moveId)
 static inline bool32 MoveHasIncreasedAccByTenOnSameType(enum Move moveId)
 {
     return gMovesInfo[SanitizeMoveId(moveId)].accIncreaseByTenOnSameType;
+}
+
+static inline bool32 MoveIgnoresResistancesIfUserPoison(enum Move moveId)
+{
+    return gMovesInfo[SanitizeMoveId(moveId)].ignoresResistancesIfUserPoison;
+}
+
+static inline bool32 MoveSetsStrictEscapePrevention(enum Move moveId)
+{
+    return gMovesInfo[SanitizeMoveId(moveId)].setsStrictEscapePrevention;
 }
 
 static inline bool32 IsMoveGravityBanned(enum Move moveId)

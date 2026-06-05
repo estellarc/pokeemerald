@@ -21996,6 +21996,480 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
         .battleAnimScript = gBattleAnimMove_MalignantChain,
     },
 
+    [MOVE_ROCK_HEART] =
+    {
+        .name = COMPOUND_STRING("Rock Heart"),
+        .description = COMPOUND_STRING(
+            "Professes love with a\n"
+            "heart-shaped rock."),
+        .effect = EFFECT_HIT,
+        .power = 80,
+        .type = TYPE_ROCK,
+        .accuracy = 100,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_PHYSICAL,
+        .additionalEffects = ADDITIONAL_EFFECTS({
+            .moveEffect = MOVE_EFFECT_INFATUATION,
+            .chance = 30,
+        }),
+        .battleAnimScript = gBattleAnimMove_RockThrow,
+    },
+
+    [MOVE_RIPTIDE] =
+    {
+        .name = COMPOUND_STRING("Riptide"),
+        .description = COMPOUND_STRING(
+            "Ripping water cuts half\n"
+            "the target's HP."),
+        .effect = EFFECT_FIXED_PERCENT_DAMAGE,
+        .power = 1,
+        .type = TYPE_WATER,
+        .accuracy = 100,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_STATUS,
+        .argument = { .damagePercentage = 50 },
+        .battleAnimScript = gBattleAnimMove_Whirlpool,
+    },
+
+    [MOVE_ARC_FAULT] =
+    {
+        .name = COMPOUND_STRING("Arc Fault"),
+        .description = COMPOUND_STRING(
+            "The user explodes and\n"
+            "sets Electric Terrain."),
+        .effect = EFFECT_HIT,
+        .power = 200,
+        .type = TYPE_ELECTRIC,
+        .accuracy = 100,
+        .pp = 5,
+        .target = TARGET_FOES_AND_ALLY,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_PHYSICAL,
+        .explosion = TRUE,
+        .parentalBondBanned = TRUE,
+        .dampBanned = TRUE,
+        .additionalEffects = ADDITIONAL_EFFECTS({
+            .moveEffect = MOVE_EFFECT_ELECTRIC_TERRAIN,
+        }),
+        .battleAnimScript = gBattleAnimMove_Explosion,
+    },
+
+    [MOVE_GRASSPIERCER] =
+    {
+        .name = COMPOUND_STRING("Grasspiercer"),
+        .description = COMPOUND_STRING(
+            "May badly poison, paralyze,\n"
+            "or put the target to sleep."),
+        .effect = EFFECT_HIT,
+        .power = 80,
+        .type = TYPE_GRASS,
+        .accuracy = 100,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_PHYSICAL,
+        .additionalEffects = ADDITIONAL_EFFECTS({
+            .moveEffect = MOVE_EFFECT_GRASSPIERCER,
+            .chance = 50,
+        }),
+        .battleAnimScript = gBattleAnimMove_NeedleArm,
+    },
+
+    [MOVE_PSYCHE_LOCK] =
+    {
+        .name = COMPOUND_STRING("Psyche Lock"),
+        .description = COMPOUND_STRING(
+            "Chains the target mentally\n"
+            "and prevents switching."),
+        .effect = EFFECT_PSYCHE_LOCK,
+        .power = 0,
+        .type = TYPE_PSYCHIC,
+        .accuracy = 100,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_STATUS,
+        .setsStrictEscapePrevention = TRUE,
+        .battleAnimScript = gBattleAnimMove_MeanLook,
+    },
+
+    [MOVE_POISONED_STARS] =
+    {
+        .name = COMPOUND_STRING("Poisoned Stars"),
+        .description = COMPOUND_STRING(
+            "Hits 3 times. Poison users\n"
+            "ignore resistances."),
+        .effect = EFFECT_HIT,
+        .power = 20,
+        .type = TYPE_POISON,
+        .accuracy = 100,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_PHYSICAL,
+        .strikeCount = 3,
+        .ignoresResistancesIfUserPoison = TRUE,
+        .additionalEffects = ADDITIONAL_EFFECTS({
+            .moveEffect = MOVE_EFFECT_POISON,
+            .chance = 30,
+        }),
+        .battleAnimScript = gBattleAnimMove_PoisonSting,
+    },
+
+    [MOVE_MAGMATIC_RAGE] =
+    {
+        .name = COMPOUND_STRING("Magmatic Rage"),
+        .description = COMPOUND_STRING(
+            "May burn. Also sears Rock\n"
+            "and Ground types."),
+        .effect = EFFECT_HIT,
+        .power = 70,
+        .type = TYPE_FIRE,
+        .accuracy = 100,
+        .pp = 15,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_PHYSICAL,
+        .additionalEffects = ADDITIONAL_EFFECTS({
+            .moveEffect = MOVE_EFFECT_BURN,
+            .chance = 10,
+        }),
+        .battleAnimScript = gBattleAnimMove_MagmaStorm,
+    },
+
+    [MOVE_SHALLOW_GRAVE] =
+    {
+        .name = COMPOUND_STRING("Shallow Grave"),
+        .description = COMPOUND_STRING(
+            "Traps the target and\n"
+            "greatly lowers Speed."),
+        .effect = EFFECT_HIT,
+        .power = 120,
+        .type = TYPE_GROUND,
+        .accuracy = 80,
+        .pp = 5,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_PHYSICAL,
+        .additionalEffects = ADDITIONAL_EFFECTS({
+            .moveEffect = MOVE_EFFECT_WRAP,
+            .multistring.wrapped = B_MSG_WRAPPED_SAND_TOMB,
+        },
+        {
+            .moveEffect = MOVE_EFFECT_STAT_MINUS,
+            .speed = 3,
+            .chance = 100,
+        }),
+        .battleAnimScript = gBattleAnimMove_SandTomb,
+    },
+
+    [MOVE_SINKHOLE] =
+    {
+        .name = COMPOUND_STRING("Sinkhole"),
+        .description = COMPOUND_STRING(
+            "Weight-based. Airborne\n"
+            "foes take less damage."),
+        .effect = EFFECT_SINKHOLE,
+        .power = 1,
+        .type = TYPE_ROCK,
+        .accuracy = 100,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_PHYSICAL,
+        .battleAnimScript = gBattleAnimMove_RockTomb,
+    },
+
+    [MOVE_SUNBLOOM] =
+    {
+        .name = COMPOUND_STRING("Sunbloom"),
+        .description = COMPOUND_STRING(
+            "Sets sunlight after hit.\n"
+            "Stronger in sunlight."),
+        .effect = EFFECT_HIT,
+        .power = 60,
+        .type = TYPE_GRASS,
+        .accuracy = 100,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_SPECIAL,
+        .additionalEffects = ADDITIONAL_EFFECTS({
+            .moveEffect = MOVE_EFFECT_SUNBLOOM,
+            .self = TRUE,
+        }),
+        .battleAnimScript = gBattleAnimMove_SunnyDay,
+    },
+
+    [MOVE_AURA_FARMING] =
+    {
+        .name = COMPOUND_STRING("Aura Farming"),
+        .description = COMPOUND_STRING(
+            "Moves last. Taking hits\n"
+            "raises its power."),
+        .effect = EFFECT_AURA_FARMING,
+        .power = 75,
+        .type = TYPE_FIGHTING,
+        .accuracy = 100,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = -3,
+        .category = DAMAGE_CATEGORY_SPECIAL,
+        .battleAnimScript = gBattleAnimMove_AuraSphere,
+    },
+
+    [MOVE_WAKE_CRASH] =
+    {
+        .name = COMPOUND_STRING("Wake Crash"),
+        .description = COMPOUND_STRING(
+            "Strikes first and hurts\n"
+            "the user by recoil."),
+        .effect = EFFECT_RECOIL,
+        .power = 120,
+        .type = TYPE_WATER,
+        .accuracy = 100,
+        .pp = 5,
+        .target = TARGET_SELECTED,
+        .priority = 1,
+        .category = DAMAGE_CATEGORY_PHYSICAL,
+        .makesContact = TRUE,
+        .argument = { .recoilPercentage = 20 },
+        .battleAnimScript = gBattleAnimMove_AquaJet,
+    },
+
+    [MOVE_RAZZLE_DAZZLE] =
+    {
+        .name = COMPOUND_STRING("Razzle Dazzle"),
+        .description = COMPOUND_STRING(
+            "Consecutive uses double\n"
+            "power up to 300."),
+        .effect = EFFECT_RAZZLE_DAZZLE,
+        .power = 75,
+        .type = TYPE_GHOST,
+        .accuracy = 100,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_SPECIAL,
+        .battleAnimScript = gBattleAnimMove_ShadowBall,
+    },
+
+    [MOVE_STEELSURGE] =
+    {
+        .name = COMPOUND_STRING("Steelsurge"),
+        .description = COMPOUND_STRING(
+            "Scatters sharp steel\n"
+            "around the opposing side."),
+        .effect = EFFECT_STEELSURGE,
+        .power = 0,
+        .type = TYPE_STEEL,
+        .accuracy = 0,
+        .pp = 20,
+        .target = TARGET_OPPONENTS_FIELD,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_STATUS,
+        .magicCoatAffected = TRUE,
+        .ignoresProtect = TRUE,
+        .mirrorMoveBanned = TRUE,
+        .forcePressure = TRUE,
+        .battleAnimScript = gBattleAnimMove_GMaxSteelsurge,
+    },
+
+    [MOVE_OVEREXPOSURE] =
+    {
+        .name = COMPOUND_STRING("Overexposure"),
+        .description = COMPOUND_STRING(
+            "Makes the target weak\n"
+            "to Ice-type moves."),
+        .effect = EFFECT_HIT,
+        .power = 65,
+        .type = TYPE_ICE,
+        .accuracy = 100,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_SPECIAL,
+        .additionalEffects = ADDITIONAL_EFFECTS({
+            .moveEffect = MOVE_EFFECT_OVEREXPOSURE,
+        }),
+        .battleAnimScript = gBattleAnimMove_FreezeDry,
+    },
+
+    [MOVE_DRY_FULMINATION] =
+    {
+        .name = COMPOUND_STRING("Dry Fulmination"),
+        .description = COMPOUND_STRING(
+            "May burn. It cannot\n"
+            "miss in harsh sunlight."),
+        .effect = EFFECT_HIT,
+        .power = 120,
+        .type = TYPE_ELECTRIC,
+        .accuracy = 70,
+        .pp = 5,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_SPECIAL,
+        .alwaysHitsInSun = TRUE,
+        .additionalEffects = ADDITIONAL_EFFECTS({
+            .moveEffect = MOVE_EFFECT_BURN,
+            .chance = 30,
+        }),
+        .battleAnimScript = gBattleAnimMove_Thunder,
+    },
+
+    [MOVE_WINDSTORM] =
+    {
+        .name = COMPOUND_STRING("Windstorm"),
+        .description = COMPOUND_STRING(
+            "Summons strong winds\n"
+            "that favor Flying types."),
+        .effect = EFFECT_WEATHER,
+        .power = 0,
+        .type = TYPE_FLYING,
+        .accuracy = 0,
+        .pp = 10,
+        .target = TARGET_FIELD,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_STATUS,
+        .argument = { .weatherType = BATTLE_WEATHER_WINDSTORM },
+        .battleAnimScript = gBattleAnimMove_Tailwind,
+    },
+
+    [MOVE_VINSECTICATION] =
+    {
+        .name = COMPOUND_STRING("Vinsectication"),
+        .description = COMPOUND_STRING(
+            "Power rises for each\n"
+            "fallen party member."),
+        .effect = EFFECT_LAST_RESPECTS,
+        .power = 50,
+        .type = TYPE_BUG,
+        .accuracy = 100,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_PHYSICAL,
+        .battleAnimScript = gBattleAnimMove_StruggleBug,
+    },
+
+    [MOVE_FUSSY_FUSS] =
+    {
+        .name = COMPOUND_STRING("Fussy Fuss"),
+        .description = COMPOUND_STRING(
+            "Lowers Attack. Stronger\n"
+            "when the user is hurt."),
+        .effect = EFFECT_FUSSY_FUSS,
+        .power = 75,
+        .type = TYPE_NORMAL,
+        .accuracy = 100,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_PHYSICAL,
+        .additionalEffects = ADDITIONAL_EFFECTS({
+            .moveEffect = MOVE_EFFECT_STAT_MINUS,
+            .attack = 1,
+            .chance = 100,
+        }),
+        .battleAnimScript = gBattleAnimMove_Headbutt,
+    },
+
+    [MOVE_JINX] =
+    {
+        .name = COMPOUND_STRING("Jinx"),
+        .description = COMPOUND_STRING(
+            "A delayed curse strikes\n"
+            "two turns later."),
+        .effect = EFFECT_FUTURE_SIGHT,
+        .power = 120,
+        .type = TYPE_GHOST,
+        .accuracy = 100,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_SPECIAL,
+        .ignoresProtect = TRUE,
+        .battleAnimScript = gBattleAnimMove_FutureSight,
+    },
+
+    [MOVE_CRASHING_FIST] =
+    {
+        .name = COMPOUND_STRING("Crashing Fist"),
+        .description = COMPOUND_STRING(
+            "Hits through protection\n"
+            "for reduced damage."),
+        .effect = EFFECT_CRASHING_FIST,
+        .power = 85,
+        .type = TYPE_FIGHTING,
+        .accuracy = 80,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_PHYSICAL,
+        .makesContact = TRUE,
+        .ignoresProtect = TRUE,
+        .battleAnimScript = gBattleAnimMove_Feint,
+    },
+
+    [MOVE_HYDRAULIC_PRESS] =
+    {
+        .name = COMPOUND_STRING("Hydraulic Press"),
+        .description = COMPOUND_STRING(
+            "Uses the user's Defense\n"
+            "to deal damage."),
+        .effect = EFFECT_BODY_PRESS,
+        .power = 80,
+        .type = TYPE_STEEL,
+        .accuracy = 100,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_PHYSICAL,
+        .battleAnimScript = gBattleAnimMove_BodyPress,
+    },
+
+    [MOVE_ICE_RINK] =
+    {
+        .name = COMPOUND_STRING("Ice Rink"),
+        .description = COMPOUND_STRING(
+            "Freezes the foe's ground\n"
+            "to make switch-ins slip."),
+        .effect = EFFECT_ICE_RINK,
+        .power = 0,
+        .type = TYPE_ICE,
+        .accuracy = 0,
+        .pp = 20,
+        .target = TARGET_OPPONENTS_FIELD,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_STATUS,
+        .magicCoatAffected = TRUE,
+        .ignoresProtect = TRUE,
+        .mirrorMoveBanned = TRUE,
+        .forcePressure = TRUE,
+        .battleAnimScript = gBattleAnimMove_IceSpinner,
+    },
+
+    [MOVE_STORM_SACRIFICE] =
+    {
+        .name = COMPOUND_STRING("Storm Sacrifice"),
+        .description = COMPOUND_STRING(
+            "If this move gets a KO,\n"
+            "rain begins to fall."),
+        .effect = EFFECT_STORM_SACRIFICE,
+        .power = 95,
+        .type = TYPE_DRAGON,
+        .accuracy = 100,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_SPECIAL,
+        .battleAnimScript = gBattleAnimMove_DragonPulse,
+    },
+
     // Z-Moves
     [MOVE_BREAKNECK_BLITZ] =
     {

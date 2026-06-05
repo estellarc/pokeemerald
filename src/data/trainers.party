@@ -126,7 +126,7 @@ Impish Nature
 - Temper Flare
 - Substitute
 - Protect
-/*- Rock Heart*/
+- Rock Heart
 
 Garganacl @ Leftovers
 Ability: Purifying Salt
@@ -146,7 +146,7 @@ Adamant Nature
 - Acrobatics
 - Crunch
 - U-Turn
-/*- Rock Heart*/
+- Rock Heart
 
 Cradily @ Leftovers
 Ability: Storm Drain
@@ -177,7 +177,7 @@ Adamant Nature
 - Iron Tail
 - Earthquake
 - Explosion
-/*- Rock Heart*/
+- Rock Heart
 
 Arcanine Hisui @ Life Orb
 Ability: Rock Head
@@ -188,7 +188,7 @@ Jolly Nature
 - Wild Charge
 - Psychic Fangs
 - Flare Blitz
-/*- Rock Heart*/
+- Rock Heart
 
 === TRAINER_LEADER_MISTY ===
 Name: Misty
@@ -267,7 +267,7 @@ Modest Nature
 - Ice Beam
 - Earth Power
 - Amnesia
-/*- Riptide*/
+- Riptide
 
 Omastar @ White Herb
 Ability: Shell Armor
@@ -279,7 +279,7 @@ Modest Nature
 - Shell Smash
 - Ice Beam
 - Tera Blast
-/*- Riptide*/
+- Riptide
 
 Octillery @ Wide Lens
 Ability: Sniper
@@ -301,7 +301,7 @@ Modest Nature
 - Psychic
 - Flash Cannon
 - Power Gem
-/*- Riptide*/
+- Riptide
 
 === TRAINER_LEADER_LT_SURGE ===
 Name: Lt. Surge
@@ -324,8 +324,7 @@ Timid Nature
 - Light Screen
 - Electro Ball
 - Volt Switch
-- Electric Terrain
-/*- Arc Fault*/
+- Arc Fault
 
 Pawmot @ Focus Sash
 Ability: Iron Fist
@@ -367,7 +366,7 @@ Bold Nature
 - Flash Cannon
 - Gravity
 - Volt Switch
-/*- Arc Fault*/
+- Arc Fault
 
 Jolteon @ Choice Specs
 Ability: Unnerve
@@ -506,7 +505,7 @@ Jolly Nature
 - Spirit Shackle
 - Shadow Sneak
 - Tailwind
-/*- Grasspiercer*/
+- Grasspiercer
 
 Vileplume @ Wise Glasses
 Ability: Effect Spore
@@ -553,7 +552,7 @@ Modest Nature
 - Perish Song
 - Hyper Voice
 - Wish
-/*- Psyche Lock*/
+- Psyche Lock
 
 Chimecho @ Light Clay
 Ability: Levitate
@@ -564,7 +563,7 @@ Bold Nature
 - Perish Song
 - Light Screen
 - Reflect
-/*- Psyche Lock*/
+- Psyche Lock
 
 Jynx @ Normalium Z
 Ability: Dry Skin
@@ -575,7 +574,7 @@ Modest Nature
 - Perish Song
 - Psychic
 - Ice Beam
-/*- Psyche Lock*/
+- Psyche Lock
 
 Wyrdeer @ Zoom Lens
 Ability: Intimidate
@@ -627,7 +626,7 @@ Modest Nature
 - Shadow Ball
 - Psyshock
 - Energy Ball
-/*- Psyche Lock*/
+- Psyche Lock
 
 === TRAINER_LEADER_KOGA_AND_JANINE ===
 Name: Koga & Janine
@@ -807,7 +806,7 @@ Jolly Nature
 - Earthquake
 - Rock Slide
 - U-Turn
-/*- Magmatic Rage*/
+- Magmatic Rage
 
 Delphox @ Choice Specs
 Ability: Blaze
@@ -851,7 +850,7 @@ Adamant Nature
 - Close Combat
 - Extreme Speed
 - Raging Fury
-/*- Magmatic Rage*/
+- Magmatic Rage
 
 === TRAINER_LEADER_GIOVANNI ===
 Name: Giovanni
@@ -957,7 +956,7 @@ Adamant Nature
 - Stone Edge
 - Megahorn
 - Tera Blast
-/*- Shallow Grave*/
+- Shallow Grave
 
 /* JOHTO GYM LEADERS */
 
@@ -1822,341 +1821,854 @@ Adamant Nature
 /* HOENN GYM LEADERS */
 
 === TRAINER_LEADER_ROXANNE ===
-Name: ROXANNE
+Name: Roxanne
 Class: Leader
 Pic: Leader Roxanne
 Gender: Female
-Music: Female
+Music: Elite Four
 Double Battle: No
-AI: Basic Trainer
+AI: Smart Trainer / Prediction / Assumptions
+Party Size: 6
+Pool Rules: Basic
+Pool Pick Functions: Default
 
-Geodude
-Level: 12
-IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
-- Tackle
-- Defense Curl
-- Rock Throw
-- Rock Tomb
+Cradily @ Big Root
+Ability: Storm Drain
+Level: 100
+EVs: 63 HP / 63 Def / 2 SpD
+Bold Nature
+- Ingrain
+- Giga Drain
+- Ancientpower
+/*- Mineragraphy*/
 
-Geodude
-Level: 12
-IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
-- Tackle
-- Defense Curl
-- Rock Throw
-- Rock Tomb
+Magcargo @ Power Herb
+Ability: Steam Engine
+Level: 100
+EVs: 63 HP / 63 SpA / 2 Spe
+Modest Nature
+- Flamethrower
+- Scorching Sands
+- Solar Beam
+- Power Gem
 
-Nosepass @ Oran Berry
-Level: 15
-IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
-- Block
-- Harden
-- Tackle
-- Rock Tomb
+Rhyperior @ Assault Vest
+Ability: Filter
+Level: 100
+EVs: 63 Atk / 63 Def / 2 HP
+Adamant Nature
+- Earthquake
+- Stone Edge
+- Temper Flare
+- Ice Punch
+
+Relicanth @ Leftovers
+Ability: Sturdy
+Level: 100
+EVs: 63 HP / 63 SpD / 2 Def
+Adamant Nature
+- Ancient Power
+- Ice Beam
+- Surf
+/*- Mineragraphy*/
+
+Minior @ Expert Belt
+Ability: Shields Down
+Level: 100
+EVs: 63 HP / 63 Atk / 2 Spe
+Tera Type: Electric
+Adamant Nature
+- Tera Blast
+- Ancient Power
+- Solar Beam
+/*- Mineragraphy*/
+
+Arcanine-Hisui @ Muscle Band
+Ability: Rock Head
+Level: 100
+EVs: 63 Spe / 55 SpD / 10 SpA
+Modest Nature
+- Head Smash
+- Flare Blitz
+- Morning Sun
+/*- Mineragraphy*/
+
+Archeops
+Ability: Klutz
+Level: 100
+EVs: 63 Atk / 63 Spe / 2 HP
+Adamant Nature
+- Acrobatics
+- Stone Edge
+- U-Turn
+- Dragon Claw
+
+Aurorus @ Expert Belt
+Ability: Refrigerate
+Level: 100
+EVs: 63 HP / 63 SpA / 2 Spe
+Quiet Nature
+- Hyper Voice
+- Ancient Power
+- Psychic
+/*- Mineragraphy*/
+
+Probopass @ Air Balloon
+Ability: Sturdy
+Level: 100
+EVs: 63 HP / 63 SpA / 2 Def
+Tags: Ace
+Bold Nature
+- Thunderbolt
+- Earth Power
+- Power Gem
+- Dazzling Gleam
 
 === TRAINER_LEADER_BRAWLY ===
-Name: BRAWLY
+Name: Brawly
 Class: Leader
 Pic: Leader Brawly
 Gender: Male
-Music: Male
-Items: Super Potion / Super Potion
+Music: Elite Four
 Double Battle: No
-AI: Basic Trainer
+AI: Smart Trainer / Prediction / Assumptions
+Party Size: 6
+Pool Rules: Basic
+Pool Pick Functions: Default
 
-Machop
-Level: 16
-IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
-- Karate Chop
+Machamp @ Black Belt
+Ability: No Guard
+Level: 100
+EVs: 63 Atk / 63 Spe / 2 HP
+Tags: Lead
+Adamant Nature
+- Cross Chop
+- Stone Edge
+- High Horsepower
+- Knock Off
+
+Medicham @ Medichamite
+Ability: Pure Power
+Level: 100
+EVs: 63 Atk / 63 Spe / 2 SpD
+Tags: Lead
+Adamant Nature
+- Fake Out
+- High Jump Kick
+- Zen Headbutt
+- Ice Punch
+
+Heracross @ Heracronite
+Ability: Moxie
+Level: 100
+EVs: 17 HP / 63 Atk / 48 Spe
+Tags: Lead
+Adamant Nature
+- Swords Dance
+- Close Combat
+- Rock Blast
+- Pin Missile
+
+Breloom @ Focus Sash
+Ability: Effect Spore
+Level: 100
+EVs: 63 Atk / 63 Spe / 2 HP
+Tags: Support
+Jolly Nature
+- Mach Punch
+- Spore
+- Seed Bomb
+- Protect
+
+Poliwrath @ Leftovers
+Ability: Damp
+Level: 100
+EVs: 63 HP / 63 Atk / 2 SpD
+Adamant Nature
+- Bulk Up
+- Drain Punch
+- Knock Off
+/*- Surfs Up*/
+
+Quaquaval @ Life Orb
+Ability: Moxie
+Level: 100
+EVs: 63 Atk / 63 Spe / 2 HP
+Tera Type: Electric
+Adamant Nature
+- Ice Spinner
+- Aqua Step
+- Tera Blast
+/*- Surfs Up*/
+
+Marshadow @ Life Orb
+Ability: Technician
+Level: 100
+EVs: 63 Atk / 63 Spe / 2 SpD
+Adamant Nature
+- Swagger
+- Spectral Thief
+- Shadow Sneak
 - Low Kick
-- Seismic Toss
-- Bulk Up
 
-Meditite
-Level: 16
-IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
-- Focus Punch
-- Light Screen
-- Reflect
-- Bulk Up
+Tauros-Paldea-Aqua @ Choice Scarf
+Ability: Intimidate
+Level: 100
+EVs: 63 Atk / 63 Spe / 2 HP
+Adamant Nature
+- Waterfall
+- Earthquake
+- Aqua Jet
+/*- Surfs Up*/
 
-Makuhita @ Sitrus Berry
-Level: 19
-IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
-- Arm Thrust
-- Vital Throw
-- Reversal
-- Bulk Up
+Hariyama @ Flame Orb
+Ability: Guts
+Level: 100
+EVs: 63 HP / 63 Atk / 2 Def
+Tags: Ace
+Tera Type: Steel
+Adamant Nature
+- Heavy Slam
+- Headlong Rush
+- Body Press
+/*- Surfs Up*/
 
 === TRAINER_LEADER_WATTSON ===
-Name: WATTSON
+Name: Wattson
 Class: Leader
 Pic: Leader Wattson
 Gender: Male
-Music: Male
-Items: Super Potion / Super Potion
-Double Battle: No
-AI: Basic Trainer
+Music: Elite Four
+Double Battle: Yes
+AI: Smart Trainer / Prediction / Assumptions
+Party Size: 6
+Pool Rules: Doubles
+Pool Pick Functions: Default
 
-Voltorb
-Level: 20
-IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
-- Rollout
-- Spark
-- Self Destruct
-- Shock Wave
+Rotom-Wash @ Damp Rock
+Ability: Levitate
+Level: 100
+EVs: 63 SpA / 63 Spe / 2 HP
+Tags: Lead
+Modest Nature
+- Rain Dance
+- Hydro Pump
+- Volt Switch
+/*- Undercurrent*/
 
-Electrike
-Level: 20
-IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
-- Shock Wave
-- Leer
-- Quick Attack
-- Howl
+Scizor @ Steel Gem
+Ability: Technician
+Level: 100
+EVs: 63 Atk / 63 Spe / 2 HP
+Tags: Lead
+Adamant Nature
+- Bullet Punch
+- U-Turn
+- Acrobatics
+- Bug Bite
 
-Magneton
-Level: 22
-IVs: 26 HP / 26 Atk / 26 Def / 26 SpA / 26 SpD / 26 Spe
-- Supersonic
-- Shock Wave
-- Thunder Wave
-- Sonic Boom
+Minun @ Leftovers
+Ability: Battery
+Level: 100
+EVs: 63 Spe / 63 HP / 2 Def 
+Timid Nature
+- Helping Hand
+- Baton Pass
+- Protect
+- Wish
 
-Manectric @ Sitrus Berry
-Level: 24
-IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
-- Quick Attack
-- Thunder Wave
-- Shock Wave
-- Howl
+Archaludon @ Leftovers
+Ability: Stamina
+Level: 100
+EVs: 63 HP / 63 SpA / 2 Def
+Modest Nature
+- Electro Shot
+- Body Press
+- Dragon Pulse
+/*- Undercurrent*/
+
+Heliolisk @ Choice Specs
+Ability: Dry Skin
+Level: 100
+EVs: 63 SpA / 63 HP / 2 Def
+Modest Nature
+- Shed Tail
+- Swift
+- Grass Knot
+/*- Undercurrent*/
+
+Kilowattrel @ Choice Specs
+Ability: Competitive
+Level: 100
+EVs: 63 SpA / 63 Spe / 2 HP
+Modest Nature
+- Hurricane
+- Thunder
+- Weather Ball
+- Volt Switch
+
+Iron Hands @ Booster Energy
+Ability: Quark Drive
+Level: 100
+EVs: 63 Atk / 63 HP / 2 Def
+Adamant Nature
+- Wild Charge
+- Close Combat
+- Fake Out
+- Play Rough
+
+Plusle @ Leftovers
+Ability: Battery
+Level: 100
+EVs: 63 Spe / 63 HP / 2 Def 
+Timid Nature
+- Helping Hand
+- Baton Pass
+- Wish
+- Substitute
+
+Manectric @ Manectite
+Ability: Intimidate
+Level: 100
+EVs: 63 Spe / 63 SpA / 2 HP
+Tags: Ace
+Modest Nature
+- Thunder
+- Weather Ball
+- Volt Switch
+/*- Undercurrent*/
 
 === TRAINER_LEADER_FLANNERY ===
-Name: FLANNERY
+Name: Flannery
 Class: Leader
 Pic: Leader Flannery
 Gender: Female
-Music: Female
-Items: Hyper Potion / Hyper Potion
+Music: Elite Four
 Double Battle: No
-AI: Basic Trainer
-
-Numel
-Level: 24
-IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
-- Overheat
-- Take Down
-- Magnitude
-- Sunny Day
-
-Slugma
-Level: 24
-IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
-- Overheat
-- Smog
-- Light Screen
-- Sunny Day
-
-Camerupt
-Level: 26
-IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
-- Overheat
-- Tackle
-- Sunny Day
-- Attract
+AI: Smart Trainer / Prediction / Assumptions
+Party Size: 6
+Pool Rules: Doubles
+Pool Pick Functions: Default
 
 Torkoal @ White Herb
-Level: 29
-IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
+Ability: Drought
+Level: 100
+EVs: 2 HP / 63 SpA / 63 SpD
+Tags: Lead
+Modest Nature
+- Solar Beam
+- Will-o-Wisp
 - Overheat
+- Stealth Rock
+
+Incineroar @ Red Card
+Ability: Intimidate
+Level: 100
+EVs: 10 Atk / 55 Def / 63 Spe
+Serious Nature
+- U-Turn
 - Sunny Day
-- Body Slam
-- Attract
+- Will-o-wisp
+- Parting Shot
+
+Skeledirge @ Red Card
+Ability: Unaware
+Level: 100
+EVs: 63 HP / 63 SpA / 2 Spe
+Tags: Weather Abuser
+Modest Nature
+- Solar Beam
+- Torch Song
+- Slack Off
+/*- Third Degree*/
+
+Blaziken @ Life Orb
+Ability: Speed Boost
+Level: 100
+EVs: 2 HP / 63 Atk / 63 Spe
+Adamant Nature
+- Fire Blast
+- Protect
+- Thunder Punch
+- Swords Dance
+
+Ursaluna @ Flame Orb
+Ability: Guts
+Level: 100
+EVs: 63 Atk / 27 Def / 38 SpD
+Tags: Ace
+Adamant Nature
+- Facade
+- Shadow Claw
+- High Horsepower
+- Taunt
+
+Typhlosion-Hisui @ Chesto Berry
+Ability: Blaze
+Level: 100
+EVs: 8 HP / 8 Def / 63 SpA / 49 SpD
+Tags: Weather Setter
+Modest Nature
+- Sunny Day
+- Rest
+- Infernal Parade
+/*- Third Degree*/
+
+Scovillain @ Eject Pack
+Ability: Chlorophyll
+Level: 100
+EVs: 2 HP / 63 SpA / 63 Spe
+Tags: Weather Setter
+Jolly Nature
+- Sunny Day
+- Energy Ball
+- Will-o-Wisp
+- Overheat
+
+Talonflame @ Leftovers
+Ability: Gale Wings
+Level: 100
+EVs: 12 Def / 63 SpA / 21 SpD / 32 Spe
+Tera Type: Fighting
+Timid Nature
+- Tera Blast
+- Air Slash
+- Roost
+/*- Third Degree*/
+
+Arcanine @ Life Orb
+Ability: Intimidate
+Level: 100
+EVs: 2 HP / 63 Atk / 63 Def
+Sassy Nature
+- Flare Blitz
+- Substitute
+- Extreme Speed
+- Wild Charge
 
 === TRAINER_LEADER_NORMAN ===
-Name: NORMAN
+Name: Norman
 Class: Leader
 Pic: Leader Norman
 Gender: Male
-Music: Male
-Items: Hyper Potion / Hyper Potion
-Double Battle: No
-AI: Basic Trainer
+Music: Elite Four
+Double Battle: Yes
+AI: Smart Trainer / Prediction / Assumptions
+Party Size: 6
+Pool Rules: Doubles
+Pool Pick Functions: Default
 
-Spinda
-Level: 27
-IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
-- Teeter Dance
-- Psybeam
-- Facade
-- Encore
+Grafaiai @ Covert Cloak
+Ability: Prankster
+Level: 100
+EVs: 63 Spe / 63 HP / 2 Def
+Tags: Lead
+Jolly Nature
+- Doodle
+- Baton Pass
+- Scary Face
+/*- Inversion*/
 
-Vigoroth
-Level: 27
-IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
-- Slash
-- Facade
-- Encore
-- Feint Attack
+Slaking @ Leftovers
+Ability: Truant
+Level: 100
+EVs: 63 Atk / 63 Spe / 2 HP
+Tags: Lead
+Adamant Nature
+- Drain Punch
+- Mega Kick
+- Aerial Ace
+- Play Rough
 
-Linoone
-Level: 29
-IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
-- Slash
+Porygon2 @ Eviolite
+Ability: Download
+Level: 100
+EVs: 63 HP / 63 SpA / 2 Def
+Tera Type: Ghost
+Modest Nature
+- Conversion_2
+- Tera Blast
+- Shadow Ball
+- Tri-Attack
+
+Linoone @ Figy Berry
+Ability: Gluttony
+Level: 100
+EVs: 63 Atk / 63 HP / 2 Spe
+Jolly Nature
+- Extreme Speed
+- Seed Bomb
 - Belly Drum
-- Facade
-- Headbutt
+- Stomping Tantrum
 
-Slaking @ Sitrus Berry
-Level: 31
-IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
-- Counter
-- Yawn
-- Facade
-- Feint Attack
+Spinda @ King's Rock
+Ability: Own Tempo
+Level: 100
+EVs: 63 HP / 63 Def / 2 SpD
+Tags: Support
+Jolly Nature
+- Dizzy Punch
+- Teeter Dance
+- Sucker Punch
+/*- Inversion */
+
+Farigiraf @ Leftovers
+Ability: Armor Tail
+Level: 100
+EVs: 63 SpA / 63 SpD / 2 HP
+Tera Type: Flying
+Modest Nature
+- Psychic
+- Tera Blast
+- Foul Play
+- Helping Hand
+
+Lopunny @ Lopunnite
+Ability: Limber
+Level: 100
+EVs: 63 Atk / 63 Spe / 2 HP
+Adamant Nature
+- Hi Jump Kick
+- Frustration
+- Fake Out
+- Triple Axel
+
+Maushold @ Loaded Dice
+Ability: Friend Guard
+Level: 100
+EVs: 63 HP / 63 Atk / 2 Spe
+Adamant Nature
+- Population Bomb
+- Bite
+- Bullet Seed
+- Helping Hand
+
+Exploud @ Throat Spray
+Ability: Soundproof
+Level: 100
+EVs: 63 SpA / 63 Spe / 2 HP
+Timid Nature
+- Boomburst
+- Extrasensory
+- Surf
+- Supersonic
 
 === TRAINER_LEADER_WINONA ===
-Name: WINONA
+Name: Winona
 Class: Leader
 Pic: Leader Winona
 Gender: Female
-Music: Female
-Items: Hyper Potion / Hyper Potion
+Music: Elite Four
 Double Battle: No
-AI: Basic Trainer / Risky
+AI: Smart Trainer / Prediction / Assumptions
+Party Size: 6
+Pool Rules: Basic
+Pool Pick Functions: Default
 
-Swablu
-Level: 29
-IVs: 25 HP / 25 Atk / 25 Def / 25 SpA / 25 SpD / 25 Spe
-- Perish Song
-- Mirror Move
-- Safeguard
-- Aerial Ace
+Drifblim @ Normal Gem
+Ability: Aftermath
+Level: 100
+EVs: 63 HP / 63 Spe / 2 Atk
+Tags: Lead
+Jolly Nature
+- Tailwind
+- Explosion
 
-Tropius
-Level: 29
-IVs: 25 HP / 25 Atk / 25 Def / 25 SpA / 25 SpD / 25 Spe
-- Sunny Day
-- Aerial Ace
-- Solar Beam
-- Synthesis
+Skarmory @ Custap Berry
+Ability: Sturdy
+Level: 100
+EVs: 63 HP / 52 Def / 13 Spe
+Impish Nature
+- Swords Dance
+- Iron Head
+- Reversal
+/*- Wing Slicer*/
 
-Pelipper
-Level: 30
-IVs: 25 HP / 25 Atk / 25 Def / 25 SpA / 25 SpD / 25 Spe
-- Water Gun
-- Supersonic
+Yanmega @ Focus Sash
+Ability: Speed Boost
+Level: 100
+EVs: 63 Spe / 63 SpA / 2 Atk
+Tags: Lead
+Modest Nature
 - Protect
-- Aerial Ace
+- Bug Buzz
+- Reversal
+- Tailwind
 
-Skarmory
-Level: 31
-IVs: 26 HP / 26 Atk / 26 Def / 26 SpA / 26 SpD / 26 Spe
-- Sand Attack
-- Fury Attack
-- Steel Wing
-- Aerial Ace
+Bombirdier @ Hard Stone
+Ability: Rocky Payload
+Level: 100
+EVs: 63 Spe / 63 Atk / 2 HP
+Adamant Nature
+- Parting Shot
+- Knock Off
+- Stone Edge
+- U-Turn
 
-Altaria @ Oran Berry
-Level: 33
-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Flygon @ Life Orb
+Ability: Levitate
+Level: 100
+EVs: 63 Spe / 63 Atk / 2 HP
+Adamant Nature
 - Earthquake
-- Dragon Breath
 - Dragon Dance
-- Aerial Ace
+- Rock Slide
+/*- Wing Slicer*/
+
+Eelektross @ Expert Belt
+Ability: Levitate
+Level: 100
+EVs: 63 Spe / 63 SpA / 2 HP
+Modest Nature
+- Flamethrower
+- Thunderbolt
+- Giga Drain
+- Volt Switch
+
+Talonflame @ Flying Gem
+Ability: Gale Wings
+Level: 100
+EVs: 63 Spe / 63 SpA / 2 HP
+Adamant Nature
+- Steel Wing
+- Dual Wingbeat
+- U-Turn
+/*- Wing Slicer*/
+
+Dragapult @ Ghost Gem
+Ability: Infiltrator
+Level: 100
+EVs: 63 Spe / 63 Atk / 2 SpD
+Tera Type: Ghost
+Adamant Nature
+- Dragon Dance
+- Dragon Darts
+- Tera Blast
+- U-Turn
+
+Altaria @ Altarianite
+Ability: Natural Cure
+Level: 100
+EVs: 63 Atk / 63 Spe / 2 SpD
+Tags: Ace
+Adamant Nature
+- Earthquake
+- Dragon Dance
+- Cotton Guard
+/*- Wing Slicer*/
 
 === TRAINER_LEADER_TATE_AND_LIZA ===
-Name: TATE&LIZA
+Name: Tate & Liza
 Class: Leaders
 Pic: Leader Tate And Liza
 Gender: Male
-Music: Female
-Items: Hyper Potion / Hyper Potion / Hyper Potion / Hyper Potion
+Music: Elite Four
 Double Battle: Yes
-AI: Basic Trainer
+AI: Smart Trainer / Prediction / Assumptions
+Party Size: 6
+Pool Rules: Doubles
+Pool Pick Functions: Default
 
-Claydol
-Level: 41
-IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
+Beheeyem @ Twisted Spoon
+Ability: Psychic Surge
+Level: 100
+EVs: 63 SpA / 63 HP / 2 SpD
+Tags: Lead
+Modest Nature
+- Expanding Force
+- Trick Room
+- Recover
+/*- Geminic Blast*/
+
+Wobbuffet @ Leftovers
+Ability: Shadow Tag
+Level: 100
+EVs: 63 HP / 33 Def / 32 SpD
+Careful Nature
+- Counter
+- Mirror Coat
+- Safeguard
+- Destiny Bond
+
+Musharna @ Light Clay
+Ability: Telepathy
+Level: 100
+EVs: 63 HP / 63 SpA / 2 Def
+Modest Nature
+- Reflect
+- Light Screen
+- Helping Hand
+/*- Geminic Blast*/
+
+Metagross @ Metagrossite
+Ability: Clear Body
+Level: 100
+EVs: 63 HP / 63 SpA / 2 Def
+Adamant Nature
+- Meteor Mash
 - Earthquake
-- Ancient Power
-- Psychic
-- Light Screen
+- Explosion
+- Zen Headbutt
 
-Xatu
-Level: 41
-IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
-- Psychic
-- Sunny Day
-- Confuse Ray
-- Calm Mind
+Noivern @ Wise Glasses
+Ability: Telepathy
+Level: 100
+EVs: 63 SpA / 63 Spe / 2 HP
+Modest Nature
+- Tailwind
+- Heat Wave
+- Boomburst
+- Dragonbreath
 
-Lunatone @ Sitrus Berry
-Level: 42
-IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
-- Light Screen
-- Psychic
-- Hypnosis
-- Calm Mind
+Oranguru @ Leftovers
+Ability: Symbiosis
+Level: 100
+EVs: 63 HP / 63 SpD / 2 SpA
+Tags: Lead
+Careful Nature
+- Future Sight
+- Foul Play
+- Nasty Plot
+- Instruct
 
-Solrock @ Sitrus Berry
-Level: 42
-IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
-- Sunny Day
-- Solar Beam
-- Psychic
-- Flamethrower
+Hoopa @ Twisted Spoon
+Ability: Magician
+Level: 100
+EVs: 63 Spe / 63 SpA / 2 HP
+Modest Nature
+- Foul Play
+- Protect
+- Hyperspace Hole
+/*- Geminic Blast*/
+
+Solrock @ Weakness Policy
+Ability: Drought
+Level: 100
+EVs: 63 HP / 63 Atk / 2 Def
+Adamant Nature
+- Head Smash
+- Zen Headbutt
+- Fire Lash
+- Morning Sun
+
+Lunatone @ Power Herb
+Ability: Friend Guard
+Level: 100
+EVs: 63 HP / 63 SpA / 2 SpD
+Modest Nature
+- Meteor Beam
+- Lumina Crash
+- Recover
+- Protect
 
 === TRAINER_LEADER_JUAN ===
-Name: JUAN
+Name: Juan
 Class: Leader
 Pic: Leader Juan
 Gender: Male
-Music: Male
-Items: Hyper Potion / Hyper Potion
+Music: Elite Four
 Double Battle: No
-AI: Basic Trainer
+AI: Smart Trainer / Prediction / Assumptions
+Party Size: 6
+Pool Rules: Doubles
+Pool Pick Functions: Default
 
-Luvdisc
-Level: 41
-IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
-- Water Pulse
-- Attract
-- Sweet Kiss
-- Flail
+Primarina @ Throat Spray
+Ability: Liquid Voice
+Level: 100
+EVs: 63 SpA / 63 Spe / 2 HP
+Tags: Lead
+Modest Nature
+- Hyper Voice
+- Dazzling Gleam
+- Psychic Noise
+/*- Showstopper*/
 
-Whiscash
-Level: 41
-IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
-- Rain Dance
-- Water Pulse
-- Amnesia
+Alomomola @ Light Clay
+Ability: Regenerator
+Level: 100
+EVs: 63 HP / 32 Def / 31 SpD
+Tags: Lead
+Relaxed Nature
+- Reflect
+- Light Screen
+- Flip Turn
+/*- Showstopper*/
+
+Whiscash @ Soft Sand
+Ability: Oblivious
+Level: 100
+EVs: 63 HP / 63 Atk / 2 Spe
+Tera Type: Flying
+Relaxed Nature
 - Earthquake
+- Waterfall
+- Muddy Water
+- Tera Blast
 
-Sealeo
-Level: 43
-IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
-- Encore
-- Body Slam
-- Aurora Beam
-- Water Pulse
+Quaquaval @ Choice Band
+Ability: Moxie
+Level: 100
+EVs: 63 Atk / 63 Spe / 2 HP
+Adamant Nature
+- Wave Crash
+- Close Combat
+- Triple Axel
+- U-Turn
 
-Crawdaunt
-Level: 43
-IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
-- Water Pulse
-- Crabhammer
-- Taunt
-- Leer
-
-Kingdra @ Chesto Berry
-Level: 46
-IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
-- Water Pulse
-- Double Team
+Walrein @ Expert Belt
+Ability: Thick Fat
+Level: 100
+EVs: 63 HP / 63 SpA / 2 Def
+Modest Nature
+- Hydro Pump
 - Ice Beam
-- Rest
+- Body Press
+- Protect
 
-/* END OF GYM LEADERS */
+Milotic @ Flame Orb
+Ability: Marvel Scale
+Level: 100
+EVs: 63 HP / 63 SpD / 2 SpA
+Tags: Ace
+Modest Nature
+- Surf
+- Rest
+- Ice Beam
+/*- Showstopper*/
+
+Bruxish @ Choice Band
+Ability: Strong Jaw
+Level: 100
+EVs: 63 Spe / 63 Atk / 2 HP
+Jolly Nature
+- Psychic Fangs
+- Crunch
+- Ice Fang
+- Super Fang
+
+Jellicent (F) @ Quick Claw
+Ability: Cursed Body
+Level: 100
+EVs: 63 Atk / 63 Spe / 2 HP
+Modest Nature
+- Safeguard
+- Water Spout
+- Energy Ball
+- Sludge Wave
+
+Kingdra @ Scope Lens
+Ability: Sniper
+Level: 100
+EVs: 63 SpA / 63 Spe / 2 HP
+Tags: Ace
+Hasty Nature
+- Draco Meteor
+- Waterfall
+- Flash Cannon
+- Blizzard
+
+/* END OF HOENN GYM LEADERS */
 
 === TRAINER_LEADER_ROARK ===
 Name: ED

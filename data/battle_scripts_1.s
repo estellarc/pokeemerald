@@ -165,6 +165,11 @@ BattleScript_TarShotMessage::
 	trymovestatchanges
 	goto BattleScript_MoveEnd
 
+BattleScript_OverexposureMessage::
+	printstring STRINGID_PKMNBECAMEWEAKERTOICE
+	waitmessage B_WAIT_TIME_LONG
+	return
+
 BattleScript_AbilityStatChange::
 	call BattleScript_AbilityPopUp
 	trystatchanges BS_EFFECT_BATTLER, STAT_CHANGE_IGNORE_SELF
@@ -1247,6 +1252,34 @@ BattleScript_EffectStealthRock::
 	waitmessage B_WAIT_TIME_LONG
 	goto BattleScript_MoveEnd
 
+BattleScript_EffectSteelsurge::
+	attackcanceler
+	setsteelsurge BattleScript_ButItFailed
+	attackanimation
+	waitanimation
+	printfromtable gDmgHazardsStringIds
+	waitmessage B_WAIT_TIME_LONG
+	goto BattleScript_MoveEnd
+
+BattleScript_EffectIceRink::
+	attackcanceler
+	seticerink BattleScript_ButItFailed
+	attackanimation
+	waitanimation
+	printstring STRINGID_ICERINKSET
+	waitmessage B_WAIT_TIME_LONG
+	goto BattleScript_MoveEnd
+
+BattleScript_IceRinkOnSwitchIn::
+	printstring STRINGID_PKMNSLIDONICE
+	waitmessage B_WAIT_TIME_LONG
+	return
+
+BattleScript_IceRinkMelted::
+	printstring STRINGID_ICERINKMELTED
+	waitmessage B_WAIT_TIME_LONG
+	return
+
 BattleScript_EffectStickyWeb::
 	attackcanceler
 	setstickyweb BattleScript_ButItFailed
@@ -2102,6 +2135,18 @@ BattleScript_EffectMeanLook::
 	jumpifgenconfiglowerthan CONFIG_B_GHOSTS_ESCAPE, GEN_6, BattleScript_EffectMeanLookGen5
 	jumpiftype BS_TARGET, TYPE_GHOST, BattleScript_ButItFailed
 BattleScript_EffectMeanLookGen5:
+	attackanimation
+	waitanimation
+	seteffectprimary BS_ATTACKER, BS_TARGET, MOVE_EFFECT_PREVENT_ESCAPE
+	printstring STRINGID_TARGETCANTESCAPENOW
+	waitmessage B_WAIT_TIME_LONG
+	goto BattleScript_MoveEnd
+
+BattleScript_EffectPsycheLock::
+	attackcanceler
+	jumpifvolatile BS_TARGET, VOLATILE_ESCAPE_PREVENTION, BattleScript_ButItFailed
+	jumpifsubstituteblocks BattleScript_ButItFailed
+	accuracycheck
 	attackanimation
 	waitanimation
 	seteffectprimary BS_ATTACKER, BS_TARGET, MOVE_EFFECT_PREVENT_ESCAPE
@@ -4443,6 +4488,12 @@ BattleScript_MoveEffectConfusion::
 	waitmessage B_WAIT_TIME_LONG
 	return
 
+BattleScript_MoveEffectInfatuation::
+	volatileanimation BS_TARGET, VOLATILE_INFATUATION
+	printstring STRINGID_PKMNFELLINLOVE
+	waitmessage B_WAIT_TIME_LONG
+	return
+
 BattleScript_MoveEffectRecoilHP25::
 	saveattacker
 	copybyte gBattlerAttacker, sBATTLER
@@ -4720,6 +4771,12 @@ BattleScript_HospitalityActivates::
 BattleScript_AttackWeakenedByStrongWinds::
 	pause B_WAIT_TIME_SHORT
 	printstring STRINGID_ATTACKWEAKENEDBSTRONGWINDS
+	waitmessage B_WAIT_TIME_LONG
+	return
+
+BattleScript_AttackWeakenedByWindstorm::
+	pause B_WAIT_TIME_SHORT
+	printstring STRINGID_ATTACKWEAKENEDBYWINDSTORM
 	waitmessage B_WAIT_TIME_LONG
 	return
 
