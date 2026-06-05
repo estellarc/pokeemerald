@@ -1,4 +1,5 @@
 #include "global.h"
+#include "constants/item.h"
 #include "item_menu.h"
 #include "battle.h"
 #include "battle_controllers.h"
@@ -625,7 +626,7 @@ void ChooseBerryForMachine(MainCallback exitCallback)
 
 void CB2_ChooseBall(void)
 {
-    GoToBagMenu(ITEMMENULOCATION_RAIDEND, POCKET_POKE_BALLS, CB2_SetUpReshowBattleScreenAfterMenu2);
+    GoToBagMenu(ITEMMENULOCATION_RAIDEND, POCKET_CONSUMABLES, CB2_SetUpReshowBattleScreenAfterMenu2);
 }
 
 void CB2_GoToSellMenu(void)
@@ -1401,7 +1402,7 @@ static void ChangeBagPocketId(u8 *bagPocketId, s8 deltaBagPocketId)
     else
         *bagPocketId += deltaBagPocketId;
 
-    if (IsVictoryCatch() && *bagPocketId == POCKET_POKE_BALLS)
+    if (IsVictoryCatch() && *bagPocketId == POCKET_CONSUMABLES)
         *bagPocketId += 1;
 
 }
