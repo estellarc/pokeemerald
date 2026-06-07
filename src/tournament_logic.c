@@ -3,124 +3,80 @@
 #include "event_data.h"
 #include "event_scripts.h"
 #include "tournament_logic.h"
+#include "tournament_opponent.h"
 #include "constants/flags.h"
 #include "constants/opponents.h"
 
-static const u32 sKantoGymLeaderRoster[] = {
-    TRAINER_LEADER_BROCK,
-    TRAINER_LEADER_MISTY,
-    TRAINER_LEADER_LT_SURGE,
-    TRAINER_LEADER_ERIKA,
-    TRAINER_LEADER_SABRINA,
-    TRAINER_LEADER_KOGA_AND_JANINE,
-    TRAINER_LEADER_BLAINE,
-    TRAINER_LEADER_GIOVANNI,
+struct Roaster
+{
+    enum TournamentOpponentID opponentId;
+    u16 completionFlag;
 };
 
-static const u16 sKantoGymLeaderFlags[] = {
-    FLAG_KANTO_LEADER_BROCK,
-    FLAG_KANTO_LEADER_MISTY,
-    FLAG_KANTO_LEADER_LT_SURGE,
-    FLAG_KANTO_LEADER_ERIKA,
-    FLAG_KANTO_LEADER_SABRINA,
-    FLAG_KANTO_LEADER_KOGA_JANINE,
-    FLAG_KANTO_LEADER_BLAINE,
-    FLAG_KANTO_LEADER_GIOVANNI
+static const struct Roaster sKantoGymLeaderRoster[] =
+{
+    { T_OPPONENT_BROCK,           FLAG_KANTO_LEADER_BROCK },
+    { T_OPPONENT_MISTY,           FLAG_KANTO_LEADER_MISTY },
+    { T_OPPONENT_LT_SURGE,        FLAG_KANTO_LEADER_LT_SURGE },
+    { T_OPPONENT_ERIKA,           FLAG_KANTO_LEADER_ERIKA },
+    { T_OPPONENT_SABRINA,         FLAG_KANTO_LEADER_SABRINA },
+    { T_OPPONENT_KOGA_AND_JANINE, FLAG_KANTO_LEADER_KOGA_JANINE },
+    { T_OPPONENT_BLAINE,          FLAG_KANTO_LEADER_BLAINE },
+    { T_OPPONENT_GIOVANNI,        FLAG_KANTO_LEADER_GIOVANNI },
 };
 
-static const u32 sJohtoGymLeaderRoster[] = {
-    TRAINER_LEADER_FALKNER,
-    TRAINER_LEADER_BUGSY,
-    TRAINER_LEADER_WHITNEY,
-    TRAINER_LEADER_MORTY,
-    TRAINER_LEADER_CHUCK,
-    TRAINER_LEADER_JASMINE,
-    TRAINER_LEADER_PRYCE,
-    TRAINER_LEADER_CLAIR,
+static const struct Roaster sJohtoGymLeaderRoster[] =
+{
+    { T_OPPONENT_FALKNER, FLAG_JOHTO_LEADER_FALKNER },
+    { T_OPPONENT_BUGSY,   FLAG_JOHTO_LEADER_BUGSY },
+    { T_OPPONENT_WHITNEY, FLAG_JOHTO_LEADER_WHITNEY },
+    { T_OPPONENT_MORTY,   FLAG_JOHTO_LEADER_MORTY },
+    { T_OPPONENT_CHUCK,   FLAG_JOHTO_LEADER_CHUCK },
+    { T_OPPONENT_JASMINE, FLAG_JOHTO_LEADER_JASMINE },
+    { T_OPPONENT_PRYCE,   FLAG_JOHTO_LEADER_PRYCE },
+    { T_OPPONENT_CLAIR,   FLAG_JOHTO_LEADER_CLAIR },
 };
 
-static const u16 sJohtoGymLeaderFlags[] = {
-    FLAG_JOHTO_LEADER_FALKNER,
-    FLAG_JOHTO_LEADER_BUGSY,
-    FLAG_JOHTO_LEADER_WHITNEY,
-    FLAG_JOHTO_LEADER_MORTY,
-    FLAG_JOHTO_LEADER_CHUCK,
-    FLAG_JOHTO_LEADER_JASMINE,
-    FLAG_JOHTO_LEADER_PRYCE,
-    FLAG_JOHTO_LEADER_CLAIR
+static const struct Roaster sHoennGymLeaderRoster[] =
+{
+    { T_OPPONENT_ROXANNE,       FLAG_HOENN_LEADER_ROXANNE },
+    { T_OPPONENT_BRAWLY,        FLAG_HOENN_LEADER_BRAWLY },
+    { T_OPPONENT_WATTSON,       FLAG_HOENN_LEADER_WATTSON },
+    { T_OPPONENT_FLANNERY,      FLAG_HOENN_LEADER_FLANNERY },
+    { T_OPPONENT_NORMAN,        FLAG_HOENN_LEADER_NORMAN },
+    { T_OPPONENT_WINONA,        FLAG_HOENN_LEADER_WINONA },
+    { T_OPPONENT_TATE_AND_LIZA, FLAG_HOENN_LEADER_TATE_AND_LIZA },
+    { T_OPPONENT_JUAN,          FLAG_HOENN_LEADER_JUAN },
 };
 
-static const u32 sHoennGymLeaderRoster[] = {
-    TRAINER_LEADER_ROXANNE,
-    TRAINER_LEADER_BRAWLY,
-    TRAINER_LEADER_WATTSON,
-    TRAINER_LEADER_FLANNERY,
-    TRAINER_LEADER_NORMAN,
-    TRAINER_LEADER_WINONA,
-    TRAINER_LEADER_TATE_AND_LIZA,
-    TRAINER_LEADER_JUAN,
+static const struct Roaster sSinnohGymLeaderRoster[] =
+{
+    { T_OPPONENT_ROARK,        FLAG_SINNOH_LEADER_ROARK },
+    { T_OPPONENT_GARDENIA,     FLAG_SINNOH_LEADER_GARDENIA },
+    { T_OPPONENT_MAYLENE,      FLAG_SINNOH_LEADER_MAYLENE },
+    { T_OPPONENT_CRASHER_WAKE, FLAG_SINNOH_LEADER_CRASHERWAKE },
+    { T_OPPONENT_FANTINA,      FLAG_SINNOH_LEADER_FANTINA },
+    { T_OPPONENT_BYRON,        FLAG_SINNOH_LEADER_BYRON },
+    { T_OPPONENT_CANDICE,      FLAG_SINNOH_LEADER_CANDICE },
+    { T_OPPONENT_VOLKNER,      FLAG_SINNOH_LEADER_VOLKNER },
 };
 
-static const u16 sHoennGymLeaderFlags[] = {
-    FLAG_HOENN_LEADER_ROXANNE,
-    FLAG_HOENN_LEADER_BRAWLY,
-    FLAG_HOENN_LEADER_WATTSON,
-    FLAG_HOENN_LEADER_FLANNERY,
-    FLAG_HOENN_LEADER_NORMAN,
-    FLAG_HOENN_LEADER_WINONA,
-    FLAG_HOENN_LEADER_TATE_AND_LIZA,
-    FLAG_HOENN_LEADER_JUAN
+static const struct Roaster sUnovaGymLeaderRoster[] =
+{
+    { T_OPPONENT_LENORA,  FLAG_UNOVA_LEADER_LENORA},
+    { T_OPPONENT_BURGH,   FLAG_UNOVA_LEADER_BURGH},
+    { T_OPPONENT_ELESA,   FLAG_UNOVA_LEADER_ELESA},
+    { T_OPPONENT_CLAY,    FLAG_UNOVA_LEADER_CLAY},
+    { T_OPPONENT_SKYLA,   FLAG_UNOVA_LEADER_SKYLA},
+    { T_OPPONENT_BRYCEN,  FLAG_UNOVA_LEADER_BRYCEN},
+    { T_OPPONENT_DRAYDEN, FLAG_UNOVA_LEADER_DRAYDEN},
+    { T_OPPONENT_CHEREN,  FLAG_UNOVA_LEADER_CHEREN},
+    { T_OPPONENT_ROXIE,   FLAG_UNOVA_LEADER_ROXIE},
+    { T_OPPONENT_MARLON,  FLAG_UNOVA_LEADER_MARLON},
 };
 
-static const u32 sSinnohGymLeaderRoster[] = {
-    TRAINER_LEADER_ROARK,
-    TRAINER_LEADER_GARDENIA,
-    TRAINER_LEADER_MAYLENE,
-    TRAINER_LEADER_CRASHER_WAKE,
-    TRAINER_LEADER_FANTINA,
-    TRAINER_LEADER_BYRON,
-    TRAINER_LEADER_CANDICE_NUTS,
-    TRAINER_LEADER_VOLKNER
-};
-
-static const u16 sSinnohGymLeaderFlags[] = {
-    FLAG_SINNOH_LEADER_ROARK,
-    FLAG_SINNOH_LEADER_GARDENIA,
-    FLAG_SINNOH_LEADER_MAYLENE,
-    FLAG_SINNOH_LEADER_CRASHERWAKE,
-    FLAG_SINNOH_LEADER_FANTINA,
-    FLAG_SINNOH_LEADER_BYRON,
-    FLAG_SINNOH_LEADER_CANDICE,
-    FLAG_SINNOH_LEADER_VOLKNER
-};
-
-static const u32 sUnovaGymLeaderRoster[] = {
-    TRAINER_LEADER_LENORA,
-    TRAINER_LEADER_BURGH,
-    TRAINER_LEADER_ELESA,
-    TRAINER_LEADER_CLAY,
-    TRAINER_LEADER_SKYLA,
-    TRAINER_LEADER_BRYCEN,
-    TRAINER_LEADER_DRAYDEN,
-    TRAINER_LEADER_CHEREN,
-    TRAINER_LEADER_ROXIE,
-    TRAINER_LEADER_MARLON
-};
-
-static const u16 sUnovaGymLeaderFlags[] = {
-    FLAG_UNOVA_LEADER_LENORA,
-    FLAG_UNOVA_LEADER_BURGH,
-    FLAG_UNOVA_LEADER_ELESA,
-    FLAG_UNOVA_LEADER_CLAY,
-    FLAG_UNOVA_LEADER_SKYLA,
-    FLAG_UNOVA_LEADER_BRYCEN,
-    FLAG_UNOVA_LEADER_DRAYDEN,
-    FLAG_UNOVA_LEADER_CHEREN,
-    FLAG_UNOVA_LEADER_ROXIE,
-    FLAG_UNOVA_LEADER_MARLON
-};
-
-static const u16 sRosterCompletionFlags[] = {
+static const u16 sRosterCompletionFlags[] =
+{
     0,
     FLAG_COMPLETED_ROSTER_KANTO,
     FLAG_COMPLETED_ROSTER_JOHTO,
@@ -130,70 +86,14 @@ static const u16 sRosterCompletionFlags[] = {
 };
 
 static const struct RosterStruct {
-  const u32 *roster;
-  const u16* leaderFlags;
+  struct Roaster *roaster;
   u32 rosterCount;
 } sGymLeaderRosters[] = {
-    [1] = { sKantoGymLeaderRoster, sKantoGymLeaderFlags, ARRAY_COUNT(sKantoGymLeaderRoster) },
-    [2] = { sJohtoGymLeaderRoster, sJohtoGymLeaderFlags, ARRAY_COUNT(sJohtoGymLeaderRoster) },
-    [3] = { sHoennGymLeaderRoster, sHoennGymLeaderFlags, ARRAY_COUNT(sHoennGymLeaderRoster) },
-    [4] = { sSinnohGymLeaderRoster, sSinnohGymLeaderFlags, ARRAY_COUNT(sSinnohGymLeaderRoster) },
-    [5] = { sUnovaGymLeaderRoster, sUnovaGymLeaderFlags, ARRAY_COUNT(sUnovaGymLeaderRoster) }
-};
-
-static const u8 *sPWTBattleScripts[] =
-{
-    /* KANTO LEADERS */
-    [TRAINER_LEADER_BROCK]           = EventScript_PWTBattleBrock,
-    [TRAINER_LEADER_MISTY]           = EventScript_PWTBattleMisty,
-    [TRAINER_LEADER_LT_SURGE]        = EventScript_PWTBattleLtSurge,
-    [TRAINER_LEADER_ERIKA]           = EventScript_PWTBattleErika,
-    [TRAINER_LEADER_KOGA_AND_JANINE] = EventScript_PWTBattleKogaJanine,
-    [TRAINER_LEADER_SABRINA]         = EventScript_PWTBattleSabrina,
-    [TRAINER_LEADER_BLAINE]          = EventScript_PWTBattleBlaine,
-    [TRAINER_LEADER_GIOVANNI]        = EventScript_PWTBattleGiovanni,
-
-    /* JOHTO LEADERS */
-    [TRAINER_LEADER_FALKNER]         = EventScript_PWTBattleFalkner,
-    [TRAINER_LEADER_BUGSY]           = EventScript_PWTBattleBugsy,
-    [TRAINER_LEADER_WHITNEY]         = EventScript_PWTBattleWhitney,
-    [TRAINER_LEADER_MORTY]           = EventScript_PWTBattleMorty,
-    [TRAINER_LEADER_CHUCK]           = EventScript_PWTBattleChuck,
-    [TRAINER_LEADER_JASMINE]         = EventScript_PWTBattleJasmine,
-    [TRAINER_LEADER_PRYCE]           = EventScript_PWTBattlePryce,
-    [TRAINER_LEADER_CLAIR]           = EventScript_PWTBattleClair,
-
-    /*HOENN LEADERS*/
-    [TRAINER_LEADER_ROXANNE]         = EventScript_PWTBattleRoxanne,
-    [TRAINER_LEADER_BRAWLY]          = EventScript_PWTBattleBrawly,
-    [TRAINER_LEADER_WATTSON]         = EventScript_PWTBattleWattson,
-    [TRAINER_LEADER_FLANNERY]        = EventScript_PWTBattleFlannery,
-    [TRAINER_LEADER_NORMAN]          = EventScript_PWTBattleNorman,
-    [TRAINER_LEADER_WINONA]          = EventScript_PWTBattleWinona,
-    [TRAINER_LEADER_TATE_AND_LIZA]   = EventScript_PWTBattleTateAndLiza,
-    [TRAINER_LEADER_JUAN]            = EventScript_PWTBattleJuan,
-
-    /*SINNOH LEADERS*/
-    [TRAINER_LEADER_ROARK]           = EventScript_PWTBattleRoark,
-    [TRAINER_LEADER_GARDENIA]        = EventScript_PWTBattleGardenia,
-    [TRAINER_LEADER_MAYLENE]         = EventScript_PWTBattleMaylene,
-    [TRAINER_LEADER_CRASHER_WAKE]    = EventScript_PWTBattleCrasherWake,
-    [TRAINER_LEADER_FANTINA]         = EventScript_PWTBattleFantina,
-    [TRAINER_LEADER_BYRON]           = EventScript_PWTBattleByron,
-    [TRAINER_LEADER_CANDICE_NUTS]    = EventScript_PWTBattleCandice,
-    [TRAINER_LEADER_VOLKNER]         = EventScript_PWTBattleVolkner,
-
-    /*UNOVA LEADERS*/
-    [TRAINER_LEADER_LENORA]         = EventScript_PWTBattleLenora,
-    [TRAINER_LEADER_BURGH]          = EventScript_PWTBattleBurgh,
-    [TRAINER_LEADER_ELESA]          = EventScript_PWTBattleElesa,
-    [TRAINER_LEADER_CLAY]           = EventScript_PWTBattleClay,
-    [TRAINER_LEADER_SKYLA]          = EventScript_PWTBattleSkyla,
-    [TRAINER_LEADER_BRYCEN]         = EventScript_PWTBattleBrycen,
-    [TRAINER_LEADER_DRAYDEN]        = EventScript_PWTBattleDrayden,
-    [TRAINER_LEADER_CHEREN]         = EventScript_PWTBattleCheren,
-    [TRAINER_LEADER_ROXIE]          = EventScript_PWTBattleRoxie,
-    [TRAINER_LEADER_MARLON] = EventScript_PWTBattleMarlon,
+    [1] = { sKantoGymLeaderRoster,  ARRAY_COUNT(sKantoGymLeaderRoster) },
+    [2] = { sJohtoGymLeaderRoster,  ARRAY_COUNT(sJohtoGymLeaderRoster) },
+    [3] = { sHoennGymLeaderRoster,  ARRAY_COUNT(sHoennGymLeaderRoster) },
+    [4] = { sSinnohGymLeaderRoster, ARRAY_COUNT(sSinnohGymLeaderRoster) },
+    [5] = { sUnovaGymLeaderRoster,  ARRAY_COUNT(sUnovaGymLeaderRoster) }
 };
 
 void ChooseRandomGymLeader(void) {
@@ -203,9 +103,10 @@ void ChooseRandomGymLeader(void) {
     u32 leader2 = 0;
     u32 leader3 = 0;
 
+
     for (u32 i = 0; i < sGymLeaderRosters[gen].rosterCount; i++)
     {
-        if(!FlagGet(sGymLeaderRosters[gen].leaderFlags[i]))
+        if(!FlagGet(sGymLeaderRosters[gen].roaster[i].completionFlag))
             countUndefeated++;
     }
     
@@ -213,7 +114,7 @@ void ChooseRandomGymLeader(void) {
 
     for (u32 i = 0; i < sGymLeaderRosters[gen].rosterCount; i++)
     {
-        if (!FlagGet(sGymLeaderRosters[gen].leaderFlags[i]))
+        if (!FlagGet(sGymLeaderRosters[gen].roaster[i].completionFlag))
         {
             if (n == 0)
             {
@@ -228,18 +129,20 @@ void ChooseRandomGymLeader(void) {
 
     do { leader2 = RandomUniform(RNG_NONE, 0, sGymLeaderRosters[gen].rosterCount - 1); } while (leader2 == leader3 || leader2 == leader1);
 
-    VarSet(VAR_GYM_LEADER_1, sGymLeaderRosters[gen].roster[leader1]);
-    VarSet(VAR_GYM_LEADER_2, sGymLeaderRosters[gen].roster[leader2]);
-    VarSet(VAR_GYM_LEADER_3, sGymLeaderRosters[gen].roster[leader3]);
+    VarSet(VAR_GYM_LEADER_1, sGymLeaderRosters[gen].roaster[leader1].opponentId);
+    VarSet(VAR_GYM_LEADER_2, sGymLeaderRosters[gen].roaster[leader2].opponentId);
+    VarSet(VAR_GYM_LEADER_3, sGymLeaderRosters[gen].roaster[leader3].opponentId);
+
+    DebugPrintf("%d, %d, %d", leader1, leader2, leader3);
 };
 
 void Script_goto_pwt_battle_script(struct ScriptContext *ctx)
 {
-    u16 trainerId = VarGet(ScriptReadHalfword(ctx));
+    enum TournamentOpponentID opponentId = VarGet(ScriptReadHalfword(ctx));
 
     Script_RequestEffects(SCREFF_V1);
 
-    ScriptCall(ctx, sPWTBattleScripts[trainerId]);
+    ScriptCall(ctx, gTournamentOpponents[opponentId].script);
 }
 
 void SetCompleteRosterFlag(void) {
@@ -248,7 +151,7 @@ void SetCompleteRosterFlag(void) {
 
     for (u32 i = 0; i < sGymLeaderRosters[gen].rosterCount; i++)
     {
-        if(FlagGet(sGymLeaderRosters[gen].leaderFlags[i]))
+        if(FlagGet(sGymLeaderRosters[gen].roaster[i].completionFlag))
             countDefeated++;
     }
 
