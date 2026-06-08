@@ -2,9 +2,9 @@ mapscripts TestingGrounds_BattleArena_MapScripts {
     MAP_SCRIPT_ON_LOAD {
         callnative(SetupOpponentGfxId)
     }
-    MAP_SCRIPT_ON_TRANSITION{
+    MAP_SCRIPT_ON_TRANSITION {
         callnative(CheckForOpponentDuo)
-        if (var(VAR_RESULT) == FALSE) {
+        if (var(VAR_RESULT) == TRUE) {
             setflag(FLAG_TEMP_1) // One Opponent
         }
         else {
@@ -26,13 +26,13 @@ script GymLeaderBattleSetup {
     {
         case 1:
             call_pwt_script(VAR_GYM_LEADER_1)
-            addvar(VAR_GYM_LEADER_BATTLE_COUNT,1)
+            addvar(VAR_GYM_LEADER_BATTLE_COUNT, 1)
         case 2:
             call_pwt_script(VAR_GYM_LEADER_2)
-            addvar(VAR_GYM_LEADER_BATTLE_COUNT,1)
+            addvar(VAR_GYM_LEADER_BATTLE_COUNT, 1)
         case 3:
             call_pwt_script(VAR_GYM_LEADER_3)
-            setvar(VAR_GYM_LEADER_BATTLE_COUNT,1)
+            setvar(VAR_GYM_LEADER_BATTLE_COUNT, 1)
             callnative(ChooseRandomGymLeader)
     }
     msgbox("Our winner is {PLAYER}!")
