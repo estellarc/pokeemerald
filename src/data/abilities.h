@@ -2480,4 +2480,12 @@ const struct AbilityInfo gAbilitiesInfo[ABILITIES_COUNT] =
         .name = _("Spicy Spray"),
         .description = COMPOUND_STRING("Burns the foe when damaged."),
     },
+
+    /* CUSTOM ABILITIES */
+    [ABILITY_METTLE] =
+    {
+        .name = _("Mettle"),
+        .description = COMPOUND_STRING("KOs boost SpA stat."),
+        .aiRating = 7,
+    },
 };
