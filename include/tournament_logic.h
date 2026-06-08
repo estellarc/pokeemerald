@@ -18,7 +18,7 @@ void CheckForOpponentDuo(void);
 void SetupOpponentGfxId(void);
 u32 CheckPartyForTech(void);
 
-enum OpponentID GetCurrentOpponent();
+enum OpponentID GetCurrentOpponent(void);
 
 extern const u16 gTechniqueFlagUnlocks[];
 

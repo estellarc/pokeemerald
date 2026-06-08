@@ -304,7 +304,7 @@ void CheckForOpponentDuo(void)
         gSpecialVar_Result = FALSE;
 }
 
-enum OpponentID GetCurrentOpponent()
+enum OpponentID GetCurrentOpponent(void)
 {
     switch (VarGet(VAR_GYM_LEADER_BATTLE_COUNT))
     {
