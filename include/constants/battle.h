@@ -220,7 +220,7 @@ enum VolatileFlags
     F(VOLATILE_WRAPPED_BY,                  wrappedBy,                     (enum BattlerId, MAX_BITS(MAX_BATTLERS_COUNT))) \
     F(VOLATILE_WRAPPED_MOVE,                wrappedMove,                   (u32, MOVES_COUNT_ALL - 1)) \
     F(VOLATILE_POWDER,                      powder,                        (u32, 1)) \
-    F(VOLATILE_UNUSED,                      padding,                       (u32, 1)) \
+    F(VOLATILE_ICE_RINK,                    iceRink,                       (u32, 1)) \
     F(VOLATILE_INFATUATION,                 infatuation,                   (enum BattlerId, MAX_BITS(MAX_BATTLERS_COUNT))) \
     F(VOLATILE_DEFENSE_CURL,                defenseCurl,                   (u32, 1)) \
     F(VOLATILE_TRANSFORMED,                 transformed,                   (u32, 1)) \
@@ -228,6 +228,7 @@ enum VolatileFlags
     F(VOLATILE_SUBSTITUTE,                  substitute,                    (u32, 1), V_BATON_PASSABLE) \
     F(VOLATILE_DESTINY_BOND,                destinyBond,                   (u32, 2)) \
     F(VOLATILE_ESCAPE_PREVENTION,           escapePrevention,              (u32, 1), V_BATON_PASSABLE) \
+    F(VOLATILE_STRICT_ESCAPE_PREVENTION,    strictEscapePrevention,        (u32, 1)) \
     F(VOLATILE_NIGHTMARE,                   nightmare,                     (u32, 1)) \
     F(VOLATILE_CURSED,                      cursed,                        (u32, 1), V_BATON_PASSABLE) \
     F(VOLATILE_FORESIGHT,                   foresight,                     (u32, 1)) \
@@ -306,6 +307,10 @@ enum VolatileFlags
     F(VOLATILE_TRUANT_COUNTER,              truantCounter,                 (u32, 1)) \
     F(VOLATILE_TRUANT_SWITCH_IN_HACK,       truantSwitchInHack,            (u32, 1)) \
     F(VOLATILE_TAR_SHOT,                    tarShot,                       (u32, 1)) \
+    F(VOLATILE_OVEREXPOSURE,                overexposure,                  (u32, 1)) \
+    F(VOLATILE_RESEARCH,                    research,                      (u32, 1)) \
+    F(VOLATILE_STUNT_DOUBLE,                stuntDouble,                   (u32, 1)) \
+    F(VOLATILE_JET_STREAM_WIND_RIDER,       jetStreamWindRider,            (u32, 1)) \
     F(VOLATILE_OCTOLOCK,                    octolock,                      (u32, 1)) \
     F(VOLATILE_CUD_CHEW,                    cudChew,                       (u32, 1)) \
     F(VOLATILE_WEATHER_ABILITY_DONE,        weatherAbilityDone,            (u32, 1)) \
@@ -326,6 +331,7 @@ enum VolatileFlags
     F(VOLATILE_PARADOX_BOOSTED_STAT,        paradoxBoostedStat,            (enum Stat, NUM_STATS - 1)) \
     F(VOLATILE_UNABLE_TO_USE_MOVE,          unableToUseMove,               (u32, 1)) \
     F(VOLATILE_ACTIVATE_DANCER,             activateDancer,                (u32, 1)) \
+    F(VOLATILE_ACTIVATE_SYNCHRONIZED_SWIM,  activateSynchronizedSwim,      (u32, 1)) \
     F(VOLATILE_TRACE_ACTIVATED,             traceActivated,                (u32, 1))
 
 
@@ -422,6 +428,7 @@ enum Hazards
     HAZARDS_TOXIC_SPIKES,
     HAZARDS_STEALTH_ROCK,
     HAZARDS_STEELSURGE,
+    HAZARDS_ICE_RINK,
     HAZARDS_MAX_COUNT,
 };
 
@@ -445,6 +452,7 @@ enum TypeSideHazard
 #define STATUS_FIELD_PSYCHIC_TERRAIN                (1 << 9)
 #define STATUS_FIELD_ION_DELUGE                     (1 << 10)
 #define STATUS_FIELD_FAIRY_LOCK                     (1 << 11)
+#define STATUS_FIELD_INVERSION                      (1 << 12)
 
 #define STATUS_FIELD_TERRAIN_ANY        (STATUS_FIELD_GRASSY_TERRAIN | STATUS_FIELD_MISTY_TERRAIN | STATUS_FIELD_ELECTRIC_TERRAIN | STATUS_FIELD_PSYCHIC_TERRAIN)
 
@@ -481,6 +489,7 @@ enum BattleWeather
     BATTLE_WEATHER_SNOW,
     BATTLE_WEATHER_FOG,
     BATTLE_WEATHER_STRONG_WINDS,
+    BATTLE_WEATHER_WINDSTORM,
     BATTLE_WEATHER_COUNT,
 };
 
@@ -498,12 +507,13 @@ enum BattleWeather
 #define B_WEATHER_SNOW          (1 << BATTLE_WEATHER_SNOW)
 #define B_WEATHER_FOG           (1 << BATTLE_WEATHER_FOG)
 #define B_WEATHER_STRONG_WINDS  (1 << BATTLE_WEATHER_STRONG_WINDS)
+#define B_WEATHER_WINDSTORM     (1 << BATTLE_WEATHER_WINDSTORM)
 
 #define B_WEATHER_DAMAGING_ANY  (B_WEATHER_HAIL | B_WEATHER_SANDSTORM)
 #define B_WEATHER_ICY_ANY       (B_WEATHER_HAIL | B_WEATHER_SNOW)
 #define B_WEATHER_LOW_LIGHT     (B_WEATHER_FOG | B_WEATHER_ICY_ANY | B_WEATHER_RAIN | B_WEATHER_SANDSTORM)
 #define B_WEATHER_PRIMAL_ANY    (B_WEATHER_RAIN_PRIMAL | B_WEATHER_SUN_PRIMAL | B_WEATHER_STRONG_WINDS)
-#define B_WEATHER_ANY           (B_WEATHER_RAIN | B_WEATHER_SANDSTORM | B_WEATHER_SUN | B_WEATHER_ICY_ANY | B_WEATHER_STRONG_WINDS | B_WEATHER_FOG)
+#define B_WEATHER_ANY           (B_WEATHER_RAIN | B_WEATHER_SANDSTORM | B_WEATHER_SUN | B_WEATHER_ICY_ANY | B_WEATHER_STRONG_WINDS | B_WEATHER_WINDSTORM | B_WEATHER_FOG)
 
 // Explicit numbers until frostbite because those shouldn't be shifted
 enum __attribute__((packed)) MoveEffect
@@ -517,6 +527,7 @@ enum __attribute__((packed)) MoveEffect
     MOVE_EFFECT_TOXIC = 6,
     MOVE_EFFECT_FROSTBITE = 7,
     MOVE_EFFECT_CONFUSION,
+    MOVE_EFFECT_INFATUATION,
     MOVE_EFFECT_FLINCH,
     MOVE_EFFECT_TRI_ATTACK,
     MOVE_EFFECT_UPROAR,
@@ -545,6 +556,7 @@ enum __attribute__((packed)) MoveEffect
     MOVE_EFFECT_TRAP_BOTH,
     MOVE_EFFECT_ROUND,
     MOVE_EFFECT_DIRE_CLAW,
+    MOVE_EFFECT_GRASSPIERCER,
     MOVE_EFFECT_SYRUP_BOMB,
     MOVE_EFFECT_FLORAL_HEALING,
     MOVE_EFFECT_SECRET_POWER,
@@ -562,6 +574,8 @@ enum __attribute__((packed)) MoveEffect
     MOVE_EFFECT_RAINBOW,
     MOVE_EFFECT_SEA_OF_FIRE,
     MOVE_EFFECT_SWAMP,
+    MOVE_EFFECT_SUNBLOOM,
+    MOVE_EFFECT_OVEREXPOSURE,
 
     // Max move effects happen earlier in the execution chain.
     // For example stealth rock from G-Max Stonesurge is set up before abilities but from Stone Axe after.
@@ -718,6 +732,7 @@ enum BattleEnvironments
 #define B_WIN_VS_OUTCOME_RIGHT   23
 #define B_WIN_MOVE_DESCRIPTION   24
 #define B_WIN_OAK_OLD_MAN        25
+#define B_CATCH_OR_NOT           26
 
 // The following are duplicate id values for windows that Battle Arena uses differently.
 #define ARENA_WIN_PLAYER_NAME      15
@@ -855,6 +870,13 @@ enum SubmoveState
     SUBMOVE_NO_EFFECT,
     SUBMOVE_SUCCESS,
     SUBMOVE_FAILURE,
+};
+
+enum VictoryCatch
+{
+    VICTORY_CATCH_START,
+    VICTORY_CATCH_OPEN_BAG,
+    VICTORY_CATCH_FAINTED,
 };
 
 #endif // GUARD_CONSTANTS_BATTLE_H

@@ -41,6 +41,29 @@ static bool32 HandleEndTurnOrder(enum BattlerId battler)
     return effect;
 }
 
+static bool32 HandleEndTurnResearch(enum BattlerId battler)
+{
+    bool32 effect = FALSE;
+
+    gBattleStruct->eventState.endTurnBattler++;
+
+    if (!IsBattlerPresent(battler) || !gBattleMons[battler].volatiles.research)
+        return FALSE;
+
+    gBattleMons[battler].volatiles.research = FALSE;
+
+    if (!gProtectStructs[battler].researchAttacked)
+    {
+        gBattlerAttacker = battler;
+        SetStatChange(battler, STAT_ATK, 2);
+        SetStatChange(battler, STAT_SPATK, 2);
+        BattleScriptCall(BattleScript_ResearchOffensesUp);
+        effect = TRUE;
+    }
+
+    return effect;
+}
+
 static bool32 HandleEndTurnVarious(enum BattlerId battler)
 {
     bool32 effect = FALSE;
@@ -70,6 +93,8 @@ static bool32 HandleEndTurnVarious(enum BattlerId battler)
 
         if (B_CHARGE < GEN_9 && gBattleMons[i].volatiles.chargeTimer > 0)
             gBattleMons[i].volatiles.chargeTimer--;
+
+        gBattleMons[i].volatiles.jetStreamWindRider = FALSE;
 
         if (gBattleMons[i].volatiles.laserFocusTimer > 0 && --gBattleMons[i].volatiles.laserFocusTimer == 0)
             gBattleMons[i].volatiles.laserFocus = FALSE;
@@ -122,6 +147,7 @@ static bool32 HandleEndTurnWeatherDamage(enum BattlerId battler)
     {
     case BATTLE_WEATHER_FOG:
     case BATTLE_WEATHER_STRONG_WINDS:
+    case BATTLE_WEATHER_WINDSTORM:
         break;
     case BATTLE_WEATHER_RAIN:
     case BATTLE_WEATHER_RAIN_PRIMAL:
@@ -243,10 +269,10 @@ static bool32 HandleEndTurnFutureSight(enum BattlerId battler)
         if (!IsBattlerPresent(battler))
             return effect;
 
-        if (gBattleStruct->futureSight[battler].move == MOVE_FUTURE_SIGHT)
-            gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_FUTURE_SIGHT;
-        else
+        if (gBattleStruct->futureSight[battler].move == MOVE_DOOM_DESIRE)
             gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_DOOM_DESIRE;
+        else
+            gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_FUTURE_SIGHT;
 
         PREPARE_MOVE_BUFFER(gBattleTextBuff1, gBattleStruct->futureSight[battler].move);
 
@@ -1401,13 +1427,18 @@ static bool32 HandleEndTurnEjectPack(enum BattlerId battler)
 
 static bool32 TryEndTurnTrainerSlide(enum BattlerId battler)
 {
-    return ((ShouldDoTrainerSlide(battler, TRAINER_SLIDE_LAST_LOW_HP) != TRAINER_SLIDE_TARGET_NONE)
-         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_LAST_HALF_HP) != TRAINER_SLIDE_TARGET_NONE)
-         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_PLAYER_LANDS_FIRST_CRITICAL_HIT) != TRAINER_SLIDE_TARGET_NONE)
-         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_ENEMY_LANDS_FIRST_CRITICAL_HIT) != TRAINER_SLIDE_TARGET_NONE)
-         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_PLAYER_LANDS_FIRST_SUPER_EFFECTIVE_HIT) != TRAINER_SLIDE_TARGET_NONE)
-         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_PLAYER_LANDS_FIRST_STAB_MOVE) != TRAINER_SLIDE_TARGET_NONE)
-         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_ENEMY_MON_UNAFFECTED) != TRAINER_SLIDE_TARGET_NONE));
+    return ((ShouldDoTrainerSlide(battler, TRAINER_SLIDE_SELF_LAST_LOW_HP) != TRAINER_SLIDE_TARGET_NONE)
+         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_OPPONENT_LAST_LOW_HP) != TRAINER_SLIDE_TARGET_NONE)
+         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_SELF_LAST_HALF_HP) != TRAINER_SLIDE_TARGET_NONE)
+         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_OPPONENT_LAST_HALF_HP) != TRAINER_SLIDE_TARGET_NONE)
+         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_DEFENDER_TAKES_FIRST_CRITICAL_HIT) != TRAINER_SLIDE_TARGET_NONE)
+         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_ATTACKER_LANDS_FIRST_CRITICAL_HIT) != TRAINER_SLIDE_TARGET_NONE)
+         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_DEFENDER_TAKES_FIRST_SUPER_EFFECTIVE_HIT) != TRAINER_SLIDE_TARGET_NONE)
+         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_ATTACKER_LANDS_FIRST_SUPER_EFFECTIVE_HIT) != TRAINER_SLIDE_TARGET_NONE)
+         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_DEFENDER_TAKES_FIRST_STAB_MOVE) != TRAINER_SLIDE_TARGET_NONE)
+         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_ATTACKER_LANDS_FIRST_STAB_MOVE) != TRAINER_SLIDE_TARGET_NONE)
+         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_OPPONENT_MON_UNAFFECTED) != TRAINER_SLIDE_TARGET_NONE)
+         || (ShouldDoTrainerSlide(battler, TRAINER_SLIDE_SELF_MON_UNAFFECTED) != TRAINER_SLIDE_TARGET_NONE));
 }
 
 static bool32 HandleEndTurnTrainerASlides(enum BattlerId battler)
@@ -1521,6 +1552,7 @@ static bool32 HandleEndTurnDynamax(enum BattlerId battler)
 static bool32 (*const sEndTurnEffectHandlers[])(enum BattlerId battler) =
 {
     [ENDTURN_ORDER] = HandleEndTurnOrder,
+    [ENDTURN_RESEARCH] = HandleEndTurnResearch,
     [ENDTURN_VARIOUS] = HandleEndTurnVarious,
     [ENDTURN_WEATHER] = HandleEndTurnWeather,
     [ENDTURN_WEATHER_DAMAGE] = HandleEndTurnWeatherDamage,
@@ -1567,12 +1599,12 @@ static bool32 (*const sEndTurnEffectHandlers[])(enum BattlerId battler) =
     [ENDTURN_FORM_CHANGE] = HandleEndTurnFormChange,
     [ENDTURN_EJECT_PACK] = HandleEndTurnEjectPack,
     [ENDTURN_SEND_OUT_REPLACEMENTS_5] = HandleEndTurnSendOutReplacements,
-    [ENDTURN_TRAINER_A_SLIDES] = HandleEndTurnTrainerASlides,
-    [ENDTURN_TRAINER_B_SLIDES] = HandleEndTurnTrainerBSlides,
-    [ENDTURN_TRAINER_PARTNER_SLIDES] = HandleEndTurnTrainerPartnerSlides,
     [ENDTURN_ARENA_TURN_END] = HandleEndTurnArenaTurnEnd,
     [ENDTURN_FAINTED_MON_ACTIONS] = HandleEndTurnFaintedMonActions,
     [ENDTURN_DYNAMAX] = HandleEndTurnDynamax,
+    [ENDTURN_TRAINER_A_SLIDES] = HandleEndTurnTrainerASlides,
+    [ENDTURN_TRAINER_B_SLIDES] = HandleEndTurnTrainerBSlides,
+    [ENDTURN_TRAINER_PARTNER_SLIDES] = HandleEndTurnTrainerPartnerSlides,
 };
 
 static bool32 HandleEndTurnEmergencyExit(enum BattlerId battler)

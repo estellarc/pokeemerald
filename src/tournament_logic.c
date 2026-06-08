@@ -2,9 +2,12 @@
 #include "battle.h"
 #include "event_data.h"
 #include "event_scripts.h"
+#include "pokemon.h"
+#include "party_menu.h"
 #include "tournament_logic.h"
 #include "tournament_opponent.h"
 #include "constants/flags.h"
+#include "constants/items.h"
 #include "constants/opponents.h"
 
 struct Roaster
@@ -96,10 +99,101 @@ sGymLeaderRosters[] =
     [ROASTER_GEN5_GYM_LEADERS] = ROASTER(sUnovaGymLeaderRoster,  FLAG_COMPLETED_ROSTER_UNOVA),
 };
 
+const u16 gTechniqueFlagUnlocks[] =
+{
+    [ITEM_TM01] = FLAG_KANTO_LEADER_BROCK,
+    [ITEM_TM02] = FLAG_KANTO_LEADER_MISTY,
+    [ITEM_TM03] = FLAG_KANTO_LEADER_LT_SURGE,
+    [ITEM_TM04] = FLAG_KANTO_LEADER_ERIKA,
+    [ITEM_TM05] = FLAG_KANTO_LEADER_SABRINA,
+    [ITEM_TM06] = FLAG_KANTO_LEADER_KOGA_JANINE,
+    [ITEM_TM07] = FLAG_KANTO_LEADER_BLAINE,
+    [ITEM_TM08] = FLAG_KANTO_LEADER_GIOVANNI,
+    [ITEM_TM09] = FLAG_JOHTO_LEADER_FALKNER,
+    [ITEM_TM10] = FLAG_JOHTO_LEADER_BUGSY,
+    [ITEM_TM11] = FLAG_JOHTO_LEADER_WHITNEY,
+    [ITEM_TM12] = FLAG_JOHTO_LEADER_MORTY,
+    [ITEM_TM13] = FLAG_JOHTO_LEADER_CHUCK,
+    [ITEM_TM14] = FLAG_JOHTO_LEADER_JASMINE,
+    [ITEM_TM15] = FLAG_JOHTO_LEADER_PRYCE,
+    [ITEM_TM16] = FLAG_JOHTO_LEADER_CLAIR,
+    [ITEM_TM17] = FLAG_HOENN_LEADER_ROXANNE,
+    [ITEM_TM18] = FLAG_HOENN_LEADER_BRAWLY,
+    [ITEM_TM19] = FLAG_HOENN_LEADER_WATTSON,
+    [ITEM_TM20] = FLAG_HOENN_LEADER_FLANNERY,
+    [ITEM_TM21] = FLAG_HOENN_LEADER_NORMAN,
+    [ITEM_TM22] = FLAG_HOENN_LEADER_WINONA,
+    [ITEM_TM23] = FLAG_HOENN_LEADER_TATE_AND_LIZA,
+    [ITEM_TM24] = FLAG_HOENN_LEADER_JUAN,
+    [ITEM_TM25] = FLAG_SINNOH_LEADER_ROARK,
+    [ITEM_TM26] = FLAG_SINNOH_LEADER_GARDENIA,
+    [ITEM_TM27] = FLAG_SINNOH_LEADER_MAYLENE,
+    [ITEM_TM28] = FLAG_SINNOH_LEADER_CRASHERWAKE,
+    [ITEM_TM29] = FLAG_SINNOH_LEADER_FANTINA,
+    [ITEM_TM30] = FLAG_SINNOH_LEADER_BYRON,
+    [ITEM_TM31] = FLAG_SINNOH_LEADER_CANDICE,
+    [ITEM_TM32] = FLAG_SINNOH_LEADER_VOLKNER,
+    [ITEM_TM33] = FLAG_UNOVA_LEADER_LENORA,
+    [ITEM_TM34] = FLAG_UNOVA_LEADER_BURGH,
+    [ITEM_TM35] = FLAG_UNOVA_LEADER_ELESA,
+    [ITEM_TM36] = FLAG_UNOVA_LEADER_CLAY,
+    [ITEM_TM37] = FLAG_UNOVA_LEADER_SKYLA,
+    [ITEM_TM38] = FLAG_UNOVA_LEADER_BRYCEN,
+    [ITEM_TM39] = FLAG_UNOVA_LEADER_DRAYDEN,
+    [ITEM_TM40] = FLAG_UNOVA_LEADER_CHEREN,
+    [ITEM_TM41] = FLAG_UNOVA_LEADER_ROXIE,
+    [ITEM_TM42] = FLAG_UNOVA_LEADER_MARLON,
+};
+
+static const u32 sLeaderSignatureTechs[] =
+{
+    MOVE_ROCK_HEART,
+    MOVE_RIPTIDE,
+    MOVE_ARC_FAULT,
+    MOVE_GRASSPIERCER,
+    MOVE_PSYCHE_LOCK,
+    MOVE_POISONED_STARS,
+    MOVE_MAGMATIC_RAGE,
+    MOVE_SHALLOW_GRAVE,
+    MOVE_WINDSTORM,
+    MOVE_VINSECTICATION,
+    MOVE_FUSSY_FUSS,
+    MOVE_JINX,
+    MOVE_CRASHING_FIST,
+    MOVE_HYDRAULIC_PRESS,
+    MOVE_ICE_RINK,
+    MOVE_STORM_SACRIFICE,
+    MOVE_MINERAGRAPHY,
+    MOVE_SURFS_UP,
+    MOVE_UNDERCURRENT,
+    MOVE_THIRD_DEGREE,
+    MOVE_INVERSION,
+    MOVE_WING_SLICER,
+    MOVE_GEMINIC_BLAST,
+    MOVE_SHOWSTOPPER,
+    MOVE_SINKHOLE,
+    MOVE_SUNBLOOM,
+    MOVE_AURA_FARMING,
+    MOVE_WAKE_CRASH,
+    MOVE_RAZZLE_DAZZLE,
+    MOVE_STEELSURGE,
+    MOVE_OVEREXPOSURE,
+    MOVE_DRY_FULMINATION,
+    MOVE_RESEARCH,
+    MOVE_CHRYSALIS,
+    MOVE_CASTING_CALL,
+    MOVE_MOUNTING_PRESSURE,
+    MOVE_JET_STREAM,
+    MOVE_STUNT_DOUBLE,
+    MOVE_CALAMITY_CLEAVE,
+    MOVE_PSIDEKICK,
+    MOVE_MOSH_PIT,
+    MOVE_SYNCHRONIZED_SWIM,
+};
+
 void ChooseRandomGymLeader(void)
 {
     enum TrainerRoaster gen = VarGet(VAR_GENERATION_CTL);
-    DebugPrintf("%d", gen);
 
     u32 countUndefeated = 0;
     u32 leader1 = 0;
@@ -156,8 +250,48 @@ void SetCompleteRosterFlag(void)
             countDefeated++;
     }
 
-    if (countDefeated == sGymLeaderRosters[gen].count)
+    if(countDefeated == sGymLeaderRosters[gen].count)
         FlagSet(sGymLeaderRosters[gen].flag);
+}
+
+bool8 ScrCmd_checkdefeatedleaders(struct ScriptContext *ctx)
+{
+    u32 countDefeated = 0;
+    enum TrainerRoaster kanto = ROASTER_GEN1_GYM_LEADERS;
+
+    for (u32 i = 0; i < sGymLeaderRosters[kanto].count; i++)
+    {
+        if(FlagGet(sGymLeaderRosters[kanto].roaster[i].flag))
+            countDefeated++;
+    }
+
+    if (countDefeated >= 1)
+        gSpecialVar_Result = TRUE;
+    else
+        gSpecialVar_Result = FALSE;
+    
+    return FALSE;
+}
+
+u32 CheckPartyForTech(void)
+{
+    u32 counter = 0;
+
+    for (u32 j = 0; j < gPartiesCount[B_TRAINER_PLAYER]; j++)
+        for (u32 i = 0; i < ARRAY_COUNT(sLeaderSignatureTechs); i++)
+            if(MonKnowsMove(&gParties[B_TRAINER_PLAYER][j], sLeaderSignatureTechs[i]))
+                counter++;
+    
+    return counter;
+}
+
+void Debug_SetAllFlagsForGymLeaders(void)
+{
+    for (u32 i = ITEM_TM01; i < ARRAY_COUNT(gTechniqueFlagUnlocks); i++)
+    {
+        if(!FlagGet(gTechniqueFlagUnlocks[i]))
+            FlagSet(gTechniqueFlagUnlocks[i]);
+    }
 }
 
 void CheckForOpponentDuo(void)
@@ -198,5 +332,3 @@ void SetupOpponentGfxId(void)
         VarSet(VAR_OBJ_GFX_ID_0, gTournamentOpponents[opponentId].graphicsId[0]);
     }
 }
-
-

@@ -85,11 +85,14 @@ struct ProtectStruct
     u32 forcedSwitch:1;
     u32 myceliumMight:1;
     u32 survivedOHKO:1; // Used to keep track of effects that allow focus punch when surviving moves like Fissure
-    u32 padding1:2;
+    u32 auraFarmingEndured:1;
+    u32 padding1:1;
     // End of 32-bit bitfield
     u16 helpingHand:3;
     u16 revengeDoubled:4;
-    u16 padding2:9;
+    u16 showstopper:1;
+    u16 researchAttacked:1;
+    u16 padding2:7;
     // End of 16-bit bitfield
     u16 physicalDmg;
     u16 specialDmg;
@@ -133,6 +136,9 @@ struct SpecialStatus
     u8 distortedTypeMatchups:1;
     u8 teraShellAbilityDone:1;
     u8 backUpTarget:3;
+    // End of byte
+    u8 synchronizedSwimUsedMove:1;
+    u8 padding4:7;
     // End of byte
     enum QueuedSwitch queuedSwitch;
     struct StatStages statStageQueue[NUM_BATTLE_STATS];
@@ -538,7 +544,8 @@ struct PartyState
     u32 changedSpecies:11; // For forms when multiple mons can change into the same Pokémon.
     u32 sentOut:1;
     u32 isKnockedOff:1;
-    u32 padding:8;
+    u32 overexposed:1;
+    u32 padding:7;
     u16 usedHeldItem;
 };
 
@@ -696,6 +703,7 @@ struct BattleStruct
     enum Species prevTurnSpecies[MAX_BATTLERS_COUNT]; // Stores species the AI has in play at start of turn
     s16 passiveHpUpdate[MAX_BATTLERS_COUNT]; // non-move damage and healing
     s16 moveDamage[MAX_BATTLERS_COUNT];
+    u16 auraFarmingDamage[MAX_BATTLERS_COUNT];
     u16 innardsOutHpLost[MAX_BATTLERS_COUNT];
     u32 moveResultFlags[MAX_BATTLERS_COUNT];
     u8 doneDoublesSpreadHit:1;
@@ -710,7 +718,7 @@ struct BattleStruct
     u8 numHazards[NUM_BATTLE_SIDES];
     u8 hazardsCounter:4; // Counter for applying hazard on switch in
     enum SubmoveState submoveAnnouncement:2;
-    u8 padding:2;
+    enum VictoryCatch victoryCatchState:2;
     u32 incrementEchoedVoice:1;
     u32 echoedVoiceCounter:3;
     u32 attackAnimPlayed:1;
@@ -720,8 +728,10 @@ struct BattleStruct
     u32 bouncedMoveIsUsed:1;
     u32 dancerSavedAttacker:3;
     u32 dancerSavedTarget:3;
+    u32 synchronizedSwimSavedAttacker:3;
+    u32 synchronizedSwimSavedTarget:3;
     u32 statChangeBattler:3;
-    u32 padding2:4;
+    u32 padding5:30;
     u8 statChangeMoveAnim:1;
     u8 tidyUpActivates:1;
     u8 positiveAnimPlayed:1;

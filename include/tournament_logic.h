@@ -16,7 +16,10 @@ void ChooseRandomGymLeader(void);
 void SetCompleteRosterFlag(void);
 void CheckForOpponentDuo(void);
 void SetupOpponentGfxId(void);
+u32 CheckPartyForTech(void);
 
 enum OpponentID GetCurrentOpponent();
+
+extern const u16 gTechniqueFlagUnlocks[];
 
 #endif //GUARD_TOURNAMENT_LOGIC_H

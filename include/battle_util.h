@@ -49,6 +49,7 @@ enum AbilityEffect
     ABILITYEFFECT_IMMUNITY,
     ABILITYEFFECT_FORM_CHANGE_ON_HIT,
     ABILITYEFFECT_DANCER,
+    ABILITYEFFECT_SYNCHRONIZED_SWIM,
     ABILITYEFFECT_MOVE_END_FOES_FAINTED, // Moxie-like abilities / Battle Bond / Magician
 
     ABILITYEFFECT_ON_FORM_CHANGE,
@@ -248,6 +249,7 @@ s32 DoFixedDamageMoveCalc(struct DamageContext *ctx);
 s32 ApplyModifiersAfterDmgRoll(struct DamageContext *ctx, s32 dmg);
 uq4_12_t CalcTypeEffectivenessMultiplier(struct DamageContext *ctx);
 uq4_12_t CalcPartyMonTypeEffectivenessMultiplier(enum Move move, enum Species speciesDef, enum Ability abilityDef);
+bool32 IsTypeChartInverted(void);
 uq4_12_t GetTypeModifier(enum Type atkType, enum Type defType);
 uq4_12_t GetOverworldTypeEffectiveness(struct Pokemon *mon, enum Type moveType);
 void UpdateMoveResultFlags(uq4_12_t modifier, u32 *resultFlags);
@@ -419,5 +421,7 @@ enum Stat GetDownloadStat(enum BattlerId battler);
 bool32 BattlerJustSwitchedIn(enum BattlerId battler);
 bool32 IsBattlersFirstTurn(enum BattlerId battler);
 struct PartyState *GetBattlerPartyState(enum BattlerId battler);
+bool32 IsVictoryCatch(void);
+bool32 IsVictoryCatchGuaranteed(void);
 
 #endif // GUARD_BATTLE_UTIL_H
