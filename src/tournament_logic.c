@@ -163,17 +163,40 @@ void SetCompleteRosterFlag(void)
 void CheckForOpponentDuo(void)
 {
     enum OpponentID opponentId = GetCurrentOpponent();
-    gSpecialVar_Result = IsOpponentADuo(opponentId);
+    
+    if (IsOpponentADuo(opponentId))
+        gSpecialVar_Result = TRUE;
+    else
+        gSpecialVar_Result = FALSE;
 }
 
 enum OpponentID GetCurrentOpponent()
 {
     switch (VarGet(VAR_GYM_LEADER_BATTLE_COUNT))
     {
-        case 0: return VarGet(VAR_GYM_LEADER_1);
-        case 1: return VarGet(VAR_GYM_LEADER_2);
-        case 2: return VarGet(VAR_GYM_LEADER_3);
+        case 1: return VarGet(VAR_GYM_LEADER_1);
+        case 2: return VarGet(VAR_GYM_LEADER_2);
+        case 3: return VarGet(VAR_GYM_LEADER_3);
     }
 
     return OPPONENT_NONE;
 }
+
+void SetupOpponentGfxId(void)
+{
+    enum OpponentID opponentId = GetCurrentOpponent();
+
+    Script_RequestEffects(SCREFF_V1);
+
+    if (IsOpponentADuo(opponentId) == TRUE)
+    {
+        VarSet(VAR_OBJ_GFX_ID_0, gTournamentOpponents[opponentId].graphicsId[0]);
+        VarSet(VAR_OBJ_GFX_ID_1, gTournamentOpponents[opponentId].graphicsId[1]);
+    }
+    else
+    {
+        VarSet(VAR_OBJ_GFX_ID_0, gTournamentOpponents[opponentId].graphicsId[0]);
+    }
+}
+
+

@@ -1,6 +1,8 @@
 #ifndef GUARD_TOURNAMENT_LOGIC_H
 #define GUARD_TOURNAMENT_LOGIC_H
 
+#include "tournament_opponent.h"
+
 enum TrainerRoaster
 {
     ROASTER_GEN1_GYM_LEADERS = 1,
@@ -13,5 +15,8 @@ enum TrainerRoaster
 void ChooseRandomGymLeader(void);
 void SetCompleteRosterFlag(void);
 void CheckForOpponentDuo(void);
+void SetupOpponentGfxId(void);
+
+enum OpponentID GetCurrentOpponent();
 
 #endif //GUARD_TOURNAMENT_LOGIC_H

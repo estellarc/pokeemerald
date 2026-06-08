@@ -68,8 +68,6 @@ struct TournamentOpponent
 
 extern const struct TournamentOpponent gTournamentOpponents[OPPONENT_COUNT];
 
-enum OpponentID GetCurrentOpponent();
-void SetupOpponentGfxId(void); // Sets `VAR_OBJ_GFX_ID_X` for the Opponent
 bool32 IsOpponentADuo(enum OpponentID opponentId); // Checks if it have two `graphicsIds`
 
 #endif // GUARD_TOURNAMENOPPONENT_H

@@ -41,7 +41,7 @@ const struct TournamentOpponent gTournamentOpponents[OPPONENT_COUNT] =
     },
     [OPPONENT_KOGA_AND_JANINE] =
     {
-        .graphicsId = OPPONENT_GFX(OBJ_EVENT_GFX_COOLTRAINER_M, OBJ_EVENT_GFX_COOLTRAINER_F),
+        .graphicsId = OPPONENT_GFX(OBJ_EVENT_GFX_EXPERT_M, OBJ_EVENT_GFX_EXPERT_F),
         .script = EventScript_PWTBattleKogaJanine,
     },
     [OPPONENT_BLAINE] =
@@ -229,21 +229,6 @@ const struct TournamentOpponent gTournamentOpponents[OPPONENT_COUNT] =
         .script = EventScript_PWTBattleMarlon,
     },
 };
-
-void SetupOpponentGfxId(void)
-{
-    enum OpponentID opponentId = GetCurrentOpponent();
-
-    if (IsOpponentADuo(opponentId) == TRUE)
-    {
-        VarSet(VAR_OBJ_GFX_ID_0, gTournamentOpponents[opponentId].graphicsId[0]);
-        VarSet(VAR_OBJ_GFX_ID_1, gTournamentOpponents[opponentId].graphicsId[1]);
-    }
-    else
-    {
-        VarSet(VAR_OBJ_GFX_ID_0, gTournamentOpponents[opponentId].graphicsId[0]);
-    }
-}
 
 bool32 IsOpponentADuo(enum OpponentID opponentId)
 {
