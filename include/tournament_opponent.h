@@ -3,7 +3,7 @@
 
 #include "gba/types.h"
 
-enum TournamentOpponentID
+enum OpponentID
 {
     T_OPPONENT_NONE,
     // Gen 1
@@ -56,13 +56,16 @@ enum TournamentOpponentID
     T_OPPONENT_COUNT,
 };
 
-
 struct TournamentOpponent
 {
     const u8 *script;
-    u16 graphicsId;
+    u16 graphicsId[2];
 };
 
 extern const struct TournamentOpponent gTournamentOpponents[T_OPPONENT_COUNT];
+
+enum OpponentID GetCurrentOpponent();
+void SetupOpponentGfxId(void); // Sets `VAR_OBJ_GFX_ID_X` for the Opponent
+bool32 IsOpponentADuo(enum OpponentID opponentId); // Checks if it have two `graphicsIds`
 
 #endif // GUARD_TOURNAMENT_OPPONENT_H

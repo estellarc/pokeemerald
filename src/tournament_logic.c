@@ -9,7 +9,7 @@
 
 struct Roaster
 {
-    enum TournamentOpponentID opponentId;
+    enum OpponentID opponentId;
     u16 completionFlag;
 };
 
@@ -86,7 +86,7 @@ static const u16 sRosterCompletionFlags[] =
 };
 
 static const struct RosterStruct {
-  struct Roaster *roaster;
+  const struct Roaster *roaster;
   u32 rosterCount;
 } sGymLeaderRosters[] = {
     [1] = { sKantoGymLeaderRoster,  ARRAY_COUNT(sKantoGymLeaderRoster) },
@@ -138,14 +138,15 @@ void ChooseRandomGymLeader(void) {
 
 void Script_goto_pwt_battle_script(struct ScriptContext *ctx)
 {
-    enum TournamentOpponentID opponentId = VarGet(ScriptReadHalfword(ctx));
+    enum OpponentID opponentId = VarGet(ScriptReadHalfword(ctx));
 
     Script_RequestEffects(SCREFF_V1);
 
     ScriptCall(ctx, gTournamentOpponents[opponentId].script);
 }
 
-void SetCompleteRosterFlag(void) {
+void SetCompleteRosterFlag(void)
+{
     u32 countDefeated = 0;
     u32 gen = VarGet(VAR_GENERATION_CTL);
 
@@ -157,4 +158,16 @@ void SetCompleteRosterFlag(void) {
 
     if(countDefeated == sGymLeaderRosters[gen].rosterCount)
         FlagSet(sRosterCompletionFlags[gen]);
+}
+
+void CheckForOpponentDuo(void)
+{
+    if (IsOpponentADuo(GetCurrentOpponent() == TRUE))
+    {
+        gSpecialVar_Result = TRUE;
+    }
+    else
+    {
+        gSpecialVar_Result = FALSE;
+    }
 }
