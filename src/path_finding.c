@@ -71,7 +71,7 @@ static bool32 FindObjectEventApproachPosition(u8 localId, enum Direction directi
 static u8 *ReconstructPath(struct PathNode *targetNode, enum Direction facingDirection);
 static inline bool32 PathFinderTargetReached(struct PathFinderContext *ctx);
 static inline u32 ManhattanDistance(s16 x1, s16 y1, s16 x2, s16 y2);
-static u8 CheckForPathFinderCollision(struct PathFinderContext *ctx, s16 x, s16 y, enum Direction direction, u8 currentBehavior, u8 nextBehavior);
+static enum Collision CheckForPathFinderCollision(struct PathFinderContext *ctx, s16 x, s16 y, enum Direction direction, u8 currentBehavior, u8 nextBehavior);
 static inline void TryCreateNeighbor(struct PathFinderContext *ctx, enum Direction direction);
 
 // PathNode utility functions
@@ -458,7 +458,7 @@ static inline bool32 PathFinderTargetReached(struct PathFinderContext *ctx)
     return FALSE;
 }
 
-static u8 CheckForPathFinderCollision(struct PathFinderContext *ctx, s16 x, s16 y, enum Direction direction, u8 currentBehavior, u8 nextBehavior)
+static enum Collision CheckForPathFinderCollision(struct PathFinderContext *ctx, s16 x, s16 y, enum Direction direction, u8 currentBehavior, u8 nextBehavior)
 {
     struct ObjectEvent *objectEvent = ctx->objectEvent;
     u8 elevation = ctx->currentNode->elevation;
