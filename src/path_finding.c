@@ -62,13 +62,13 @@ struct PathFinderContext
     u32 nodeCount;
     u32 speed;
     u32 maxNodes;
-    u8 facingDirection;
+    enum Direction facingDirection;
 };
 
 static u8 *FindPathForObjectEvent(struct PathFinderContext *ctx, u32 maxNodes);
-static void MoveObjectEventToCoords(u8 localId, s16 targetX, s16 targetY, u8 facingDirection, u32 speed, u32 maxNodes);
+static void MoveObjectEventToCoords(u8 localId, s16 targetX, s16 targetY, enum Direction facingDirection, u32 speed, u32 maxNodes);
 static bool32 FindObjectEventApproachPosition(u8 localId, enum Direction direction, struct Coords16* result);
-static u8 *ReconstructPath(struct PathNode *targetNode, u8 facingDirection);
+static u8 *ReconstructPath(struct PathNode *targetNode, enum Direction facingDirection);
 static inline bool32 PathFinderTargetReached(struct PathFinderContext *ctx);
 static inline u32 ManhattanDistance(s16 x1, s16 y1, s16 x2, s16 y2);
 static u8 CheckForPathFinderCollision(struct PathFinderContext *ctx, s16 x, s16 y, enum Direction direction, u8 currentBehavior, u8 nextBehavior);
@@ -204,7 +204,7 @@ static const u8* sMovementsBySpeed[] =
     sWalkFasterMovement,
 };
 
-struct PathFinderContext CreatePathFinderContext(struct ObjectEvent *objectEvent, s16 targetX, s16 targetY, u8 facingDirection, u8 speed, u32 maxNodes)
+struct PathFinderContext CreatePathFinderContext(struct ObjectEvent *objectEvent, s16 targetX, s16 targetY, enum Direction facingDirection, u8 speed, u32 maxNodes)
 {
     assertf(speed < ARRAY_COUNT(sMovementsBySpeed), "Invalid speed. Speed can be [0, %u]. Current: %u.", ARRAY_COUNT(sMovementsBySpeed) - 1, speed);
     assertf(facingDirection < CARDINAL_DIRECTION_COUNT, "Invalid direction. It can only be a cardinal direction.");
@@ -244,7 +244,7 @@ void ScrCmd_moveobjecttocoords(struct ScriptContext *ctx)
     u16 localId = VarGet(ScriptReadHalfword(ctx));
     u16 x = VarGet(ScriptReadHalfword(ctx));
     u16 y = VarGet(ScriptReadHalfword(ctx));
-    u8 facingDirection = VarGet(ScriptReadByte(ctx));
+    enum Direction facingDirection = VarGet(ScriptReadByte(ctx));
     u8 speed = VarGet(ScriptReadByte(ctx));
     u32 maxNodes = ScriptReadWord(ctx);
     struct ObjectEvent *objEvent;
@@ -270,8 +270,8 @@ void ScrCmd_approachobject(struct ScriptContext *ctx)
 {
     u16 localId = VarGet(ScriptReadHalfword(ctx));
     u16 targetLocalId = VarGet(ScriptReadHalfword(ctx));
-    u8 facingDirection = VarGet(ScriptReadByte(ctx));
-    u8 approachDirection = VarGet(ScriptReadByte(ctx));
+    enum Direction facingDirection = VarGet(ScriptReadByte(ctx));
+    enum Direction approachDirection = VarGet(ScriptReadByte(ctx));
     u8 speed = VarGet(ScriptReadByte(ctx));
     u32 maxNodes = ScriptReadWord(ctx);
     struct ObjectEvent *objEvent;
@@ -303,7 +303,7 @@ void ScrCmd_approachobject(struct ScriptContext *ctx)
     SetMovingNpcId(localId);
 }
 
-static void MoveObjectEventToCoords(u8 localId, s16 targetX, s16 targetY, u8 facingDirection, u32 speed, u32 maxNodes)
+static void MoveObjectEventToCoords(u8 localId, s16 targetX, s16 targetY, enum Direction facingDirection, u32 speed, u32 maxNodes)
 {
     if (PATH_FINDER_PRINT_TIME)
         CycleCountStart();
@@ -390,7 +390,7 @@ static inline void TryCreateNeighbor(struct PathFinderContext *ctx, enum Directi
             neighborY = currentNode->y + gDirectionToVectors[direction].y;
             nextBehavior = MapGridGetMetatileBehaviorAt(neighborX, neighborY);
         }
-        
+
         u32 speed = ctx->speed;
         if (SLOW_MOVEMENT_ON_STAIRS && speed != 0 &&
             ObjectMovingOnRockStairsWithBehaviors(ctx->objectEvent, direction, currentBehavior, nextBehavior))
@@ -416,7 +416,7 @@ static inline void TryCreateNeighbor(struct PathFinderContext *ctx, enum Directi
     }
 }
 
-static u8 *ReconstructPath(struct PathNode *targetNode, u8 facingDirection)
+static u8 *ReconstructPath(struct PathNode *targetNode, enum Direction facingDirection)
 {
     u32 moves = 0;
     for (struct PathNode *it = targetNode; it != NULL; it = it->parent)
