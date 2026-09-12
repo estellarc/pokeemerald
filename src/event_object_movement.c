@@ -975,6 +975,7 @@ static const u8 sSpinDirectionAnimNums[] = {
 };
 
 bool8 (*const gOppositeDirectionBlockedMetatileFuncs[])(u8) = {
+    MetatileBehavior_IsATile,
     MetatileBehavior_IsSouthBlocked,
     MetatileBehavior_IsNorthBlocked,
     MetatileBehavior_IsWestBlocked,
@@ -982,6 +983,7 @@ bool8 (*const gOppositeDirectionBlockedMetatileFuncs[])(u8) = {
 };
 
 bool8 (*const gDirectionBlockedMetatileFuncs[])(u8) = {
+    MetatileBehavior_IsATile,
     MetatileBehavior_IsNorthBlocked,
     MetatileBehavior_IsSouthBlocked,
     MetatileBehavior_IsEastBlocked,
@@ -6460,18 +6462,17 @@ enum Collision GetSidewaysStairsCollision(struct ObjectEvent *objectEvent, enum 
     return collision;
 }
 
-__attribute__((flatten))
-static enum Collision GetVanillaCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u8 elevation, enum Direction direction, u8 nextBehavior)
+static enum Collision GetVanillaCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u8 nextBehavior, enum Direction direction)
 {
     if (IsCoordOutsideObjectEventMovementRange(objectEvent, x, y))
         return COLLISION_OUTSIDE_RANGE;
-    else if (MapGridGetCollisionAt(x, y) || GetMapBorderIdAt(x, y) == CONNECTION_INVALID || IsMetatileDirectionallyImpassable(objectEvent, x, y, direction, nextBehavior))
+    else if (MapGridGetCollisionAt(x, y) || GetMapBorderIdAt(x, y) == CONNECTION_INVALID || IsMetatileDirectionallyImpassable(objectEvent, nextBehavior, direction))
         return COLLISION_IMPASSABLE;
     else if (objectEvent->trackedByCamera && !CanCameraMoveInDirection(direction))
         return COLLISION_IMPASSABLE;
-    else if (IsElevationMismatchAt(elevation, x, y))
+    else if (IsElevationMismatchAt(objectEvent->currentElevation, x, y))
         return COLLISION_ELEVATION_MISMATCH;
-    else if (DoesObjectCollideWithObjectAt(objectEvent, x, y, elevation))
+    else if (DoesObjectCollideWithObjectAt(objectEvent, x, y, objectEvent->currentElevation))
         return COLLISION_OBJECT_EVENT;
 
     return COLLISION_NONE;
@@ -6507,8 +6508,37 @@ static bool8 ObjectEventOnRightSideStair(struct ObjectEvent *objectEvent, s16 x,
     }
 }
 
-__attribute__((flatten))
-enum Collision GetCollisionWithBehaviorsAtCoords(struct ObjectEvent *objectEvent, s16 x, s16 y, u8 elevation, enum Direction dir, u8 currentBehavior, u8 nextBehavior)
+static bool32 CheckStairCollisionGuards(enum Direction dir, u8 currentBehavior, u8 nextBehavior)
+{
+    bool8 curIsLeftTop = MetatileBehavior_IsSidewaysStairsLeftSideTop(currentBehavior);
+    bool8 curIsRightTop = MetatileBehavior_IsSidewaysStairsRightSideTop(currentBehavior);
+    bool8 curIsLeftBottom = MetatileBehavior_IsSidewaysStairsLeftSideBottom(currentBehavior);
+    bool8 curIsRightBottom = MetatileBehavior_IsSidewaysStairsRightSideBottom(currentBehavior);
+
+    bool8 nextIsLeftTop = MetatileBehavior_IsSidewaysStairsLeftSideTop(nextBehavior);
+    bool8 nextIsRightTop = MetatileBehavior_IsSidewaysStairsRightSideTop(nextBehavior);
+    bool8 nextIsLeftBottom = MetatileBehavior_IsSidewaysStairsLeftSideBottom(nextBehavior);
+    bool8 nextIsRightBottom = MetatileBehavior_IsSidewaysStairsRightSideBottom(nextBehavior);
+
+    if (nextIsLeftTop == TRUE && dir == DIR_EAST)
+        return TRUE;  // moving onto left-side top edge east from regular ground -> nope
+    if (nextIsRightTop == TRUE && dir == DIR_WEST)
+        return TRUE;  // moving onto left-side top edge east from regular ground -> nope
+    if (nextIsRightBottom == TRUE && (dir == DIR_EAST || dir == DIR_SOUTH))
+        return TRUE;  // moving into right-side bottom edge from regular ground -> nah
+    if (nextIsLeftBottom == TRUE && (dir == DIR_WEST || dir == DIR_SOUTH))
+        return TRUE;  // moving onto left-side bottom edge from regular ground -> nah
+    if ((curIsLeftTop == TRUE || curIsRightTop == TRUE) && dir == DIR_NORTH)
+        return TRUE;  // trying to move north off of top-most tile onto same level doesn't work
+    if (!(curIsLeftTop == TRUE || curIsRightTop == TRUE) && dir == DIR_SOUTH && (nextIsLeftTop == TRUE || nextIsRightTop == TRUE))
+        return TRUE;  // trying to move south onto top stair tile at same level from non-stair -> no
+    if (!(curIsLeftBottom == TRUE || curIsRightBottom == TRUE) && dir == DIR_NORTH && (nextIsLeftBottom == TRUE || nextIsRightBottom == TRUE))
+        return TRUE;  // trying to move north onto top stair tile at same level from non-stair -> no
+
+    return FALSE;
+}
+
+enum Collision GetCollisionAtCoords(struct ObjectEvent *objectEvent, s16 x, s16 y, enum Direction dir)
 {
     enum Collision collision;
 
@@ -6517,29 +6547,57 @@ enum Collision GetCollisionWithBehaviorsAtCoords(struct ObjectEvent *objectEvent
         return COLLISION_NONE;
     #endif
 
+    u8 currentBehavior = objectEvent->currentMetatileBehavior;
+    u8 nextBehavior = MapGridGetMetatileBehaviorAt(x, y);
     objectEvent->directionOverwrite = DIR_NONE;
 
-    //sideways stairs checks
-    if (MetatileBehavior_IsSidewaysStairsLeftSideTop(nextBehavior) && dir == DIR_EAST)
-        return COLLISION_IMPASSABLE;    //moving onto left-side top edge east from regular ground -> nope
-    else if (MetatileBehavior_IsSidewaysStairsRightSideTop(nextBehavior) && dir == DIR_WEST)
-        return COLLISION_IMPASSABLE;    //moving onto left-side top edge east from regular ground -> nope
-    else if (MetatileBehavior_IsSidewaysStairsRightSideBottom(nextBehavior) && (dir == DIR_EAST || dir == DIR_SOUTH))
-        return COLLISION_IMPASSABLE;    //moving into right-side bottom edge from regular ground -> nah
-    else if (MetatileBehavior_IsSidewaysStairsLeftSideBottom(nextBehavior) && (dir == DIR_WEST || dir == DIR_SOUTH))
-        return COLLISION_IMPASSABLE;    //moving onto left-side bottom edge from regular ground -> nah
-    else if ((MetatileBehavior_IsSidewaysStairsLeftSideTop(currentBehavior) || MetatileBehavior_IsSidewaysStairsRightSideTop(currentBehavior))
-     && dir == DIR_NORTH)
-        return COLLISION_IMPASSABLE;    //trying to move north off of top-most tile onto same level doesn't work
-    else if (!(MetatileBehavior_IsSidewaysStairsLeftSideTop(currentBehavior) || MetatileBehavior_IsSidewaysStairsRightSideTop(currentBehavior))
-     && dir == DIR_SOUTH && (MetatileBehavior_IsSidewaysStairsLeftSideTop(nextBehavior) || MetatileBehavior_IsSidewaysStairsRightSideTop(nextBehavior)))
-        return COLLISION_IMPASSABLE;    //trying to move south onto top stair tile at same level from non-stair -> no
-    else if (!(MetatileBehavior_IsSidewaysStairsLeftSideBottom(currentBehavior) || MetatileBehavior_IsSidewaysStairsRightSideBottom(currentBehavior))
-     && dir == DIR_NORTH && (MetatileBehavior_IsSidewaysStairsLeftSideBottom(nextBehavior) || MetatileBehavior_IsSidewaysStairsRightSideBottom(nextBehavior)))
-        return COLLISION_IMPASSABLE;    //trying to move north onto top stair tile at same level from non-stair -> no
+    // sideways stairs collision guards
+    if (CheckStairCollisionGuards(dir, currentBehavior, nextBehavior) && dir == DIR_EAST)
+        return COLLISION_IMPASSABLE;
 
     // regular checks
-    collision = GetVanillaCollision(objectEvent, x, y, elevation, dir, nextBehavior);
+    collision = GetVanillaCollision(objectEvent, x, y, nextBehavior, dir);
+
+    //sideways stairs direction change checks
+    collision = GetSidewaysStairsCollision(objectEvent, dir, currentBehavior, nextBehavior, collision);
+    switch (collision)
+    {
+    case COLLISION_SIDEWAYS_STAIRS_TO_LEFT:
+        if (ObjectEventOnLeftSideStair(objectEvent, x, y, objectEvent->currentElevation, dir))
+            return COLLISION_OBJECT_EVENT;
+        objectEvent->directionOverwrite = GetLeftSideStairsDirection(dir);
+        return COLLISION_NONE;
+    case COLLISION_SIDEWAYS_STAIRS_TO_RIGHT:
+        if (ObjectEventOnRightSideStair(objectEvent, x, y, objectEvent->currentElevation, dir))
+            return COLLISION_OBJECT_EVENT;
+        objectEvent->directionOverwrite = GetRightSideStairsDirection(dir);
+        return COLLISION_NONE;
+    default:
+        return collision;
+    }
+}
+
+__attribute__((flatten))
+enum Collision GetNodeCollisionAtCoords(struct ObjectEvent *objectEvent, s16 x, s16 y, u8 elevation, enum Direction dir, u8 currentBehavior, u8 nextBehavior)
+{
+    objectEvent->directionOverwrite = DIR_NONE;
+
+    // sideways stairs collision guards
+    if (CheckStairCollisionGuards(dir, currentBehavior, nextBehavior) && dir == DIR_EAST)
+        return COLLISION_IMPASSABLE;
+
+    // regular checks
+    enum Collision collision = COLLISION_NONE;
+
+    // Similar to GetVanillaCollision() but without Outside movement range check.
+    if (MapGridGetCollisionAt(x, y) || GetMapBorderIdAt(x, y) == CONNECTION_INVALID || IsMetatileDirectionallyImpassable(objectEvent, nextBehavior, dir))
+        collision = COLLISION_IMPASSABLE;
+    else if (objectEvent->trackedByCamera && !CanCameraMoveInDirection(dir))
+        collision = COLLISION_IMPASSABLE;
+    else if (IsElevationMismatchAt(objectEvent->currentElevation, x, y))
+        collision = COLLISION_ELEVATION_MISMATCH;
+    else if (DoesObjectCollideWithObjectAt(objectEvent, x, y, elevation))
+        collision = COLLISION_OBJECT_EVENT;
 
     //sideways stairs direction change checks
     collision = GetSidewaysStairsCollision(objectEvent, dir, currentBehavior, nextBehavior, collision);
@@ -6560,12 +6618,6 @@ enum Collision GetCollisionWithBehaviorsAtCoords(struct ObjectEvent *objectEvent
     }
 }
 
-enum Collision GetCollisionAtCoords(struct ObjectEvent *objectEvent, s16 x, s16 y, enum Direction dir)
-{
-    u8 nextBehavior = MapGridGetMetatileBehaviorAt(x, y);
-    return GetCollisionWithBehaviorsAtCoords(objectEvent, x, y, objectEvent->currentElevation, dir, objectEvent->currentMetatileBehavior, nextBehavior);
-}
-
 u8 GetCollisionFlagsAtCoords(struct ObjectEvent *objectEvent, s16 x, s16 y, enum Direction direction)
 {
     u8 flags = 0;
@@ -6573,7 +6625,7 @@ u8 GetCollisionFlagsAtCoords(struct ObjectEvent *objectEvent, s16 x, s16 y, enum
 
     if (IsCoordOutsideObjectEventMovementRange(objectEvent, x, y))
         flags |= 1 << (COLLISION_OUTSIDE_RANGE - 1);
-    if (MapGridGetCollisionAt(x, y) || GetMapBorderIdAt(x, y) == CONNECTION_INVALID || IsMetatileDirectionallyImpassable(objectEvent, x, y, direction, nextBehavior) || (objectEvent->trackedByCamera && !CanCameraMoveInDirection(direction)))
+    if (IsMetatileDirectionallyImpassable(objectEvent, nextBehavior, direction) || MapGridGetCollisionAt(x, y) || GetMapBorderIdAt(x, y) == CONNECTION_INVALID || (objectEvent->trackedByCamera && !CanCameraMoveInDirection(direction)))
         flags |= 1 << (COLLISION_IMPASSABLE - 1);
     if (IsElevationMismatchAt(objectEvent->currentElevation, x, y))
         flags |= 1 << (COLLISION_ELEVATION_MISMATCH - 1);
@@ -6608,10 +6660,10 @@ static bool8 IsCoordOutsideObjectEventMovementRange(struct ObjectEvent *objectEv
     return FALSE;
 }
 
-bool8 IsMetatileDirectionallyImpassable(struct ObjectEvent *objectEvent, s16 x, s16 y, enum Direction direction, u8 nextBehavior)
+bool8 IsMetatileDirectionallyImpassable(struct ObjectEvent *objectEvent, u8 nextBehavior, enum Direction direction)
 {
-    if (gOppositeDirectionBlockedMetatileFuncs[direction - 1](objectEvent->currentMetatileBehavior)
-        || gDirectionBlockedMetatileFuncs[direction - 1](nextBehavior))
+    if (gOppositeDirectionBlockedMetatileFuncs[direction](objectEvent->currentMetatileBehavior)
+        || gDirectionBlockedMetatileFuncs[direction](nextBehavior))
         return TRUE;
 
     return FALSE;
@@ -6619,7 +6671,6 @@ bool8 IsMetatileDirectionallyImpassable(struct ObjectEvent *objectEvent, s16 x, 
 
 u32 GetObjectObjectCollidesWith(struct ObjectEvent *objectEvent, s16 x, s16 y, u8 elevation, bool32 addCoords)
 {
-    u8 i;
     struct ObjectEvent *curObject;
 
     if (objectEvent->localId == OBJ_EVENT_ID_FOLLOWER)
@@ -6631,7 +6682,7 @@ u32 GetObjectObjectCollidesWith(struct ObjectEvent *objectEvent, s16 x, s16 y, u
         y += objectEvent->currentCoords.y;
     }
 
-    for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
+    for (u32 i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
         curObject = &gObjectEvents[i];
         if (curObject->active && (curObject->movementType != MOVEMENT_TYPE_FOLLOW_PLAYER || objectEvent != &gObjectEvents[gPlayerAvatar.objectEventId]) && curObject != objectEvent
@@ -9969,20 +10020,18 @@ static u8 GetReflectionTypeByMetatileBehavior(u32 behavior)
 enum Direction GetLedgeJumpDirectionWithBehavior(enum Direction direction, u8 nextBehavior)
 {
     static bool8 (*const ledgeBehaviorFuncs[])(u8) = {
-        [DIR_SOUTH - 1] = MetatileBehavior_IsJumpSouth,
-        [DIR_NORTH - 1] = MetatileBehavior_IsJumpNorth,
-        [DIR_WEST - 1]  = MetatileBehavior_IsJumpWest,
-        [DIR_EAST - 1]  = MetatileBehavior_IsJumpEast,
+        [DIR_NONE]  = MetatileBehavior_IsATile,
+        [DIR_SOUTH] = MetatileBehavior_IsJumpSouth,
+        [DIR_NORTH] = MetatileBehavior_IsJumpNorth,
+        [DIR_WEST]  = MetatileBehavior_IsJumpWest,
+        [DIR_EAST]  = MetatileBehavior_IsJumpEast,
     };
 
-    if (direction == DIR_NONE)
-        return DIR_NONE;
-    else if (direction > DIR_EAST)
+    if (direction > DIR_EAST)
         direction -= DIR_EAST;
 
-    direction--;
     if (ledgeBehaviorFuncs[direction](nextBehavior) == TRUE)
-        return direction + 1;
+        return direction;
 
     return DIR_NONE;
 }
@@ -10132,9 +10181,9 @@ void ScriptFaceEachOther(struct ScriptContext *ctx)
     u32 localIdTwo = VarGet(ScriptReadHalfword(ctx));
     struct ObjectEvent *objectOne = &gObjectEvents[GetObjectEventIdByLocalId(localIdOne)];
     struct ObjectEvent *objectTwo = &gObjectEvents[GetObjectEventIdByLocalId(localIdTwo)];
-    
+
     Script_RequestEffects(SCREFF_V1 | SCREFF_HARDWARE);
-    
+
     ObjectEventsTurnToEachOther(objectOne, objectTwo);
 }
 
@@ -11879,7 +11928,7 @@ bool8 MovementType_OverworldWildEncounter_WanderAround_Step2(struct ObjectEvent 
 {
     if (!ObjectEventExecSingleMovementAction(objectEvent, sprite))
         return FALSE;
-    
+
     SetMovementDelay(sprite, sMovementDelaysOWE[Random() % ARRAY_COUNT(sMovementDelaysOWE)]);
     sprite->sTypeFuncId = 3;
     return TRUE;
@@ -11894,13 +11943,13 @@ bool8 MovementType_OverworldWildEncounter_WanderAround_Step3(struct ObjectEvent 
         sprite->sTypeFuncId = 4;
         return TRUE;
     }
-    
+
     if (OW_MON_WANDER_WALK == TRUE && IS_OW_MON_OBJ(objectEvent))
         UpdateMonMoveInPlace(objectEvent, sprite);
 
     if (CanAwareOWESeePlayer(objectEvent))
         sprite->sTypeFuncId = 7;
-    
+
     return FALSE;
 }
 
@@ -11956,7 +12005,7 @@ bool8 MovementType_OverworldWildEncounter_Common_Step9(struct ObjectEvent *objec
 {
     if (ObjectEventExecSingleMovementAction(objectEvent, sprite))
         sprite->sTypeFuncId = 10;
-    
+
     return TRUE;
 }
 
@@ -12064,7 +12113,7 @@ bool8 MovementType_OverworldWildEncounter_FleePlayer_Step11(struct ObjectEvent *
         enum Direction newDirection = DirectionOfOWEToPlayerFromCollision(objectEvent);
         if (newDirection != objectEvent->movementDirection)
             newDirection = GetOppositeDirection(newDirection);
-        
+
         movementActionId = GetOWEWalkMovementActionInDirectionWithSpeed(newDirection, OWE_GetActiveSpeedFromSpecies(speciesId));
         if (CheckRestrictedOWEMovement(objectEvent, newDirection))
         {

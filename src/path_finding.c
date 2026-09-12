@@ -466,7 +466,7 @@ static u8 CheckForPathFinderCollision(struct PathFinderContext *ctx, s16 x, s16 
     if (GetLedgeJumpDirectionWithBehavior(direction, nextBehavior) != DIR_NONE)
         return COLLISION_LEDGE_JUMP;
 
-    return GetCollisionWithBehaviorsAtCoords(objectEvent, x, y, elevation, direction, currentBehavior, nextBehavior);
+    return GetNodeCollisionAtCoords(objectEvent, x, y, elevation, direction, currentBehavior, nextBehavior);
 }
 
 static inline s16 PathFinder_Abs(s16 value)
