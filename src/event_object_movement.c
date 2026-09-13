@@ -6580,13 +6580,17 @@ enum Collision GetCollisionAtCoords(struct ObjectEvent *objectEvent, s16 x, s16 
 __attribute__((flatten))
 enum Collision GetNodeCollisionAtCoords(struct ObjectEvent *objectEvent, s16 x, s16 y, u8 elevation, enum Direction dir, u8 currentBehavior, u8 nextBehavior)
 {
+    #if OW_FLAG_NO_COLLISION != 0
+    if (FlagGet(OW_FLAG_NO_COLLISION))
+        return COLLISION_NONE;
+    #endif
+
     objectEvent->directionOverwrite = DIR_NONE;
 
     // sideways stairs collision guards
     if (CheckStairCollisionGuards(dir, currentBehavior, nextBehavior) && dir == DIR_EAST)
         return COLLISION_IMPASSABLE;
 
-    // regular checks
     enum Collision collision = COLLISION_NONE;
 
     // Similar to GetVanillaCollision() but without Outside movement range check.
@@ -6594,7 +6598,7 @@ enum Collision GetNodeCollisionAtCoords(struct ObjectEvent *objectEvent, s16 x, 
         collision = COLLISION_IMPASSABLE;
     else if (objectEvent->trackedByCamera && !CanCameraMoveInDirection(dir))
         collision = COLLISION_IMPASSABLE;
-    else if (IsElevationMismatchAt(objectEvent->currentElevation, x, y))
+    else if (IsElevationMismatchAt(elevation, x, y))
         collision = COLLISION_ELEVATION_MISMATCH;
     else if (DoesObjectCollideWithObjectAt(objectEvent, x, y, elevation))
         collision = COLLISION_OBJECT_EVENT;
