@@ -58,8 +58,8 @@ However Weighted A* can generate less natural-looking paths than regual A*, and 
 
 #### Changed
 
-- Fix the pathfinder wrongly considering the object's movement range for collision checking
-- Fix follwing the `OW_FLAG_NO_COLLISION` flag.
+- Fix the pathfinder wrongly considering the object's movement range for collision checking.
+- Fix the pathfinder wrongly following the `OW_FLAG_NO_COLLISION` flag.
 - Promote `Collision` and `Direction` enum usage.
 - Rename `PATH_FINDER_PRINT_TIME` to `PATH_FINDER_DEBUG_PRINT_TIME`.
 
@@ -82,9 +82,9 @@ However Weighted A* can generate less natural-looking paths than regual A*, and 
 ### 1.1.0 - 2026-1-20
 
 #### Added
-- Add `approachobject` macro.
-- Add `SLOW_MOVEMENT_ON_STAIRS` support .
-- Add `PATH_FINDER_PRINT_TIME`.
+- Added `approachobject` macro.
+- Added `SLOW_MOVEMENT_ON_STAIRS` support .
+- Added `PATH_FINDER_PRINT_TIME`.
 
 #### Changed
 - Improve neighbor expansion, about a ~25% faster.
