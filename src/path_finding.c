@@ -15,16 +15,17 @@
 
 #pragma GCC optimize("O3")
 
-#define PATH_FINDER_WEIGHT          1.5
-#define PATH_FINDER_PRINT_TIME      FALSE
+#define PATH_FINDER_WEIGHT                       1.5   // Controls CostH's added weight.
+#define PATH_FINDER_DEBUG_PRINT_TIME             FALSE // When TRUE prints how many cycles it took to compute the operation. 
+#define PATH_FINDER_DEBUG_NODE_GENERATION_INFO   FALSE // When TRUE prints debug node generation information.
 
 struct PathNode
 {
     struct PathNode *parent;
     u32 costG;
     u32 costF;
-    s16 x;
-    s16 y;
+    s16 posX;
+    s16 posY;
     u8 elevation;
     u8 movementAction;
     enum Direction originDirection;
@@ -196,7 +197,28 @@ static const u8 sPathFinderFailScript[] =
     MOVEMENT_ACTION_STEP_END,
 };
 
-static const u8* sMovementsBySpeed[] =
+UNUSED static const char *const sDebugCollisionNames[] =
+{
+    [COLLISION_NONE]                       = "COLLISION_NONE",
+    [COLLISION_OUTSIDE_RANGE]              = "COLLISION_OUTSIDE_RANGE",
+    [COLLISION_IMPASSABLE]                 = "COLLISION_IMPASSABLE",
+    [COLLISION_ELEVATION_MISMATCH]         = "COLLISION_ELEVATION_MISMATCH",
+    [COLLISION_OBJECT_EVENT]               = "COLLISION_OBJECT_EVENT",
+    [COLLISION_STOP_SURFING]               = "COLLISION_STOP_SURFING",
+    [COLLISION_LEDGE_JUMP]                 = "COLLISION_LEDGE_JUMP",
+    [COLLISION_PUSHED_BOULDER]             = "COLLISION_PUSHED_BOULDER",
+    [COLLISION_ROTATING_GATE]              = "COLLISION_ROTATING_GATE",
+    [COLLISION_WHEELIE_HOP]                = "COLLISION_WHEELIE_HOP",
+    [COLLISION_ISOLATED_VERTICAL_RAIL]     = "COLLISION_ISOLATED_VERTICAL_RAIL",
+    [COLLISION_ISOLATED_HORIZONTAL_RAIL]   = "COLLISION_ISOLATED_HORIZONTAL_RAIL",
+    [COLLISION_VERTICAL_RAIL]              = "COLLISION_VERTICAL_RAIL",
+    [COLLISION_HORIZONTAL_RAIL]            = "COLLISION_HORIZONTAL_RAIL",
+    [COLLISION_STAIR_WARP]                 = "COLLISION_STAIR_WARP",
+    [COLLISION_SIDEWAYS_STAIRS_TO_RIGHT]   = "COLLISION_SIDEWAYS_STAIRS_TO_RIGHT",
+    [COLLISION_SIDEWAYS_STAIRS_TO_LEFT]    = "COLLISION_SIDEWAYS_STAIRS_TO_LEFT",
+};
+
+static const u8 *sMovementsBySpeed[] =
 {
     sWalkSlowMovement,
     sWalkNormalMovement,
@@ -305,7 +327,7 @@ void ScrCmd_approachobject(struct ScriptContext *ctx)
 
 static void MoveObjectEventToCoords(u8 localId, s16 targetX, s16 targetY, enum Direction facingDirection, u32 speed, u32 maxNodes)
 {
-    if (PATH_FINDER_PRINT_TIME)
+    if (PATH_FINDER_DEBUG_PRINT_TIME)
         CycleCountStart();
 
     struct ObjectEvent *objectEvent = &gObjectEvents[GetObjectEventIdByLocalId(localId)];
@@ -323,7 +345,7 @@ static void MoveObjectEventToCoords(u8 localId, s16 targetX, s16 targetY, enum D
     objectEvent->directionOverwrite = DIR_NONE;
     ScriptMovement_StartObjectMovementScript(localId, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, movementScript);
 
-    if (PATH_FINDER_PRINT_TIME)
+    if (PATH_FINDER_DEBUG_PRINT_TIME)
         DebugPrintf("Path Finding Time: %u", CycleCountEnd());
 }
 
@@ -346,6 +368,9 @@ static u8 *FindPathForObjectEvent(struct PathFinderContext *ctx, u32 maxNodes)
 
         enum Direction direction = ctx->currentNode->originDirection;
         u8 neighborCount = sNeighborCount[direction];
+        
+        if (PATH_FINDER_DEBUG_NODE_GENERATION_INFO)
+            DebugPrintf("NODE X: %d, Y:%d:", ctx->currentNode->posX - MAP_OFFSET, ctx->currentNode->posY - MAP_OFFSET);
 
         for (u32 i = 0; i < neighborCount; i++)
             TryCreateNeighbor(ctx, sNeighbors[direction][i]);
@@ -354,7 +379,7 @@ static u8 *FindPathForObjectEvent(struct PathFinderContext *ctx, u32 maxNodes)
     return NULL;
 }
 
-static bool32 FindObjectEventApproachPosition(u8 localId, enum Direction direction, struct Coords16* result)
+static bool32 FindObjectEventApproachPosition(u8 localId, enum Direction direction, struct Coords16 *result)
 {
     assertf(direction == DIR_NONE, "Direction not supported.")
     assertf(direction < CARDINAL_DIRECTION_COUNT, "Invalid direction. It can only be a cardinal direction.");
@@ -374,20 +399,23 @@ static bool32 FindObjectEventApproachPosition(u8 localId, enum Direction directi
 static inline void TryCreateNeighbor(struct PathFinderContext *ctx, enum Direction direction)
 {
     struct PathNode *currentNode = ctx->currentNode;
-    s16 neighborX = currentNode->x + gDirectionToVectors[direction].x;
-    s16 neighborY = currentNode->y + gDirectionToVectors[direction].y;
+    s16 neighborX = currentNode->posX + gDirectionToVectors[direction].x;
+    s16 neighborY = currentNode->posY + gDirectionToVectors[direction].y;
     u8 nextBehavior = MapGridGetMetatileBehaviorAt(neighborX, neighborY);
     u8 currentBehavior = currentNode->currentBehavior;
 
     enum Collision collision = CheckForPathFinderCollision(ctx, neighborX, neighborY, direction, currentBehavior, nextBehavior);
+
+    if (PATH_FINDER_DEBUG_NODE_GENERATION_INFO)
+        DebugPrintf("CHECK: X: %d, Y: %d - %s", neighborX - MAP_OFFSET, neighborY - MAP_OFFSET, sDebugCollisionNames[collision]);
 
     if (collision == COLLISION_NONE)
     {
         if (ctx->objectEvent->directionOverwrite != DIR_NONE)
         {
             direction = ctx->objectEvent->directionOverwrite;
-            neighborX = currentNode->x + gDirectionToVectors[direction].x;
-            neighborY = currentNode->y + gDirectionToVectors[direction].y;
+            neighborX = currentNode->posX + gDirectionToVectors[direction].x;
+            neighborY = currentNode->posY + gDirectionToVectors[direction].y;
             nextBehavior = MapGridGetMetatileBehaviorAt(neighborX, neighborY);
         }
 
@@ -405,8 +433,8 @@ static inline void TryCreateNeighbor(struct PathFinderContext *ctx, enum Directi
     }
     else if (collision == COLLISION_LEDGE_JUMP)
     {
-        neighborX = currentNode->x + gDirectionToVectors[direction].x * 2;
-        neighborY = currentNode->y + gDirectionToVectors[direction].y * 2;
+        neighborX = currentNode->posX + gDirectionToVectors[direction].x * 2;
+        neighborY = currentNode->posY + gDirectionToVectors[direction].y * 2;
         nextBehavior = MapGridGetMetatileBehaviorAt(neighborX, neighborY);
 
         u32 tentativeG = currentNode->costG + sPrecomputedDistance[direction] * 2;
@@ -452,7 +480,7 @@ static u8 *ReconstructPath(struct PathNode *targetNode, enum Direction facingDir
 
 static inline bool32 PathFinderTargetReached(struct PathFinderContext *ctx)
 {
-    if (ctx->target.x == ctx->currentNode->x && ctx->target.y == ctx->currentNode->y)
+    if (ctx->target.x == ctx->currentNode->posX && ctx->target.y == ctx->currentNode->posY)
         return TRUE;
 
     return FALSE;
@@ -502,15 +530,13 @@ static inline u8 OppositeDirection(enum Direction direction)
 static inline void PathNode_CreateStart(struct PathFinderContext *ctx)
 {
     struct PathNode *node = &ctx->nodeBuffer[ctx->nodeCount];
-    s16 x = ctx->start.x;
-    s16 y = ctx->start.y;
 
     node->parent = NULL;
-    node->x = x;
-    node->y = y;
+    node->posX = ctx->start.x;
+    node->posY = ctx->start.y;
     node->elevation = ctx->objectEvent->currentElevation;
     node->costG = 0;
-    node->costF = PathNode_ComputeCostH(ctx, x, y);
+    node->costF = PathNode_ComputeCostH(ctx, ctx->start.x, ctx->start.y);
     node->movementAction = MOVEMENT_ACTION_NONE;
     node->originDirection = DIR_NONE;
     node->currentBehavior = ctx->objectEvent->currentMetatileBehavior;
@@ -532,8 +558,8 @@ static inline void PathNode_CreateNeighbor(struct PathFinderContext *ctx, s16 x,
     struct PathNode *node = &ctx->nodeBuffer[ctx->nodeCount];
 
     node->parent = ctx->currentNode;
-    node->x = x;
-    node->y = y;
+    node->posX = x;
+    node->posY = y;
     node->elevation = elevation;
     node->costG = costG;
     node->costF = costG + PathNode_ComputeCostH(ctx, x, y);
@@ -573,8 +599,8 @@ static inline bool32 PathNode_HasLowerCost(struct PathNode *node1, struct PathNo
 
 static inline bool32 PathNode_MatchesCoords(struct PathNode *node1, s16 x, s16 y, u8 elevation)
 {
-    if (node1->x == x &&
-        node1->y == y &&
+    if (node1->posX == x &&
+        node1->posY == y &&
         node1->elevation == elevation)
     {
         return TRUE;
@@ -753,7 +779,7 @@ static void PathList_Destroy(struct PathList *list)
 
 static bool32 PathList_TryInsert(struct PathList *list, struct PathNode *node, struct PathNode **out)
 {
-    u32 index = PathNode_Hash(node->x, node->y, node->elevation) & list->mask;
+    u32 index = PathNode_Hash(node->posX, node->posY, node->elevation) & list->mask;
 
     for (u32 i = 0; i < list->capacity; i++)
     {
@@ -767,7 +793,7 @@ static bool32 PathList_TryInsert(struct PathList *list, struct PathNode *node, s
 
             return TRUE;
         }
-        else if (PathNode_MatchesCoords(current, node->x, node->y, node->elevation))
+        else if (PathNode_MatchesCoords(current, node->posX, node->posY, node->elevation))
         {
             *out = current;
             return FALSE;
