@@ -1,9 +1,9 @@
-# Pathfinder 1.1.2
+# Pathfinder 1.1.3
 
 ## About
 
 This is a complete reimplementation of [Juanjo's old path finder](https://www.pokecommunity.com/threads/applymovement-vs-a-algorithm-for-pathfinding.445293/) for [`pokeemerald-expansion`](https://github.com/rh-hideout/pokeemerald-expansion) `1.13.0+`.
-This branch adds the `moveobjecttocoords` and `approachobject` scripting macros, for generating movement scripts at run time, achieved by using the Weighted A* Algorithm. This branch aims to give romhackers an easier way to create more complex movement scripts and reduce branching.
+This branch adds the `moveobjecttocoords` and `approachobject` scripting macros, for generating movement scripts at run time, achieved by using the Weighted A* Algorithm. This branch aims to give romhackers an easier way to create more complex movement scripts and reduce branching on their scripts.
 
 ![demo1](https://github.com/user-attachments/assets/5285b7d1-2e55-4afa-95e2-09312e922544)
 ![demo2](https://github.com/user-attachments/assets/febabae1-9816-4cd8-96e4-ee33bd0ba198)
@@ -19,8 +19,7 @@ moveobjecttocoords localId:req, x:req, y:req, facingDirection:req, speed=1, maxn
 
 - `facingDirection`, it controls the facing direction. If it is `DIR_NONE`, the facing direction will depend on the generated script.
 - `speed`, it controls the movement speed and goes from 0 to 4. 0 is slow, 1 is normal, and so on.
-- `maxnodes`, it controls how many nodes can be generated (aka, how many tiles can be checked).
-
+- `maxnodes`, it controls how many nodes can be generated (aka, how many tiles can be checked). Nodes are heap allocated.
 ### `approachobject`
 ```gas
 approachobject localId:req, targetLocalId:req, facingDirection:req, approachDirection:req, speed=1, maxnodes=256
@@ -39,7 +38,10 @@ Try to only use the macro when you are sure there is a valid path.
 
 ## Why Weighted A*?
 
-This variant of the A* algorithm provides better performance for searching the first valid path. This done by giving more priority to nodes more close to the goal.
+
+
+This variant of the A* algorithm provides better performance for searching the first valid path at the cost of slightly worst paths. This done by giving more priority to nodes more close to the goal.
+ 
 
 ### A* vs Weighted A*
 
@@ -51,12 +53,28 @@ However Weighted A* can generate less natural-looking paths than regual A*, and 
 
 ## Changelog
 
+###
+### 1.1.3 -2026-7-12
+
+#### Changed
+
+- Fix the pathfinder wrongly considering the object's movement range for collision checking
+- Fix follwing the `OW_FLAG_NO_COLLISION` flag.
+- Promote `Collision` and `Direction` enum usage.
+- Rename `PATH_FINDER_PRINT_TIME` to `PATH_FINDER_DEBUG_PRINT_TIME`.
+
+#### Added
+- Added `PATH_FINDER_DEBUG_NODE_GENERATION_INFO`.
+
 ### 1.1.2 - 2026-6-20
+
+#### Changed
+
 - Updated to `expansion` 1.16.1.
 
 ### 1.1.1 - 2026-4-14
 
-### Changed
+#### Changed
 - Improve preformance by caching metatile behaviors.
 - Fix potential UBs.
 - Fix hash function `fmix32` implementation.
@@ -72,7 +90,7 @@ However Weighted A* can generate less natural-looking paths than regual A*, and 
 - Improve neighbor expansion, about a ~25% faster.
 
 ## Credits
-- Juanjo, for the orginal path planner idea.
+- Juanjo, for the orginal path planner idea, which serve as inspiration.
 - Phantonomy, for the `approachobject` idea.
 
 ## Reference
